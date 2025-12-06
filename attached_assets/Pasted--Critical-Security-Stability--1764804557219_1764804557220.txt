@@ -1,0 +1,534 @@
+*********************************************
+## Critical (Security & Stability)
+*********************************************
+
+		### 1. **Replace Custom Authentication with Firebase Auth**
+
+			Your current SHA-256 hashing is cryptographically weak for passwords. The authentication system stores password hashes in Firestore which could be exposed.
+
+			**What to do:**
+			- Use Firebase Authentication with email/password
+			- Add email verification and password reset flows
+			- Remove password hashes from Firestore documents
+			- Keep the current user profile data (displayName, role, theme) separate from auth
+
+			**Effort:** Medium | **Impact:** High
+
+		### 2. **Add Firebase Security Rules**
+
+			I didn't see any `firestore.rules` file. Without proper rules, anyone with your Firebase config could read/write all data.
+
+			**Recommended rules structure:**
+			```javascript
+			rules_version = '2';
+			service cloud.firestore {
+			  match /databases/{database}/documents {
+			    // Users can only access their own data
+			    match /users/{userId}/{document=**} {
+			      allow read, write: if request.auth != null && request.auth.uid == userId;
+			    }
+			    // Settings readable by authenticated users, writable by admins
+			    match /settings/{docId} {
+			      allow read: if request.auth != null;
+			      allow write: if request.auth != null && 
+			        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'Admin';
+			    }
+			  }
+			}
+			```
+*********************************************
+**Effort:** Low | **Impact:** Critical
+*********************************************
+
+		### 3. **Add Error Boundaries**
+
+			If one module crashes, the whole app goes down. Wrap modules in error boundaries:
+
+			```tsx
+			// components/ErrorBoundary.tsx
+			class ErrorBoundary extends React.Component {
+			  state = { hasError: false };
+			  
+			  static getDerivedStateFromError() {
+			    return { hasError: true };
+			  }
+			  render() {
+			    if (this.state.hasError) {
+			      return <ErrorFallback onRetry={() => this.setState({ hasError: false })} />;
+			    }
+			    return this.props.children;
+			  }
+			}
+			```
+			**Effort:** Low | **Impact:** High
+
+*********************************************
+## High Priority (Performance & UX)
+*********************************************
+
+	### 4. **Implement Code Splitting / Lazy Loading**
+
+		All 16 modules load upfront. For a ~20k line app, this slows initial load significantly.
+
+		```tsx
+		// App.tsx - Replace direct imports with lazy loading
+		const ProjectsView = React.lazy(() => import('./modules/Projects/ProjectsView'));
+		const FinancialView = React.lazy(() => import('./modules/Financial/FinancialView'));
+		// ... etc
+
+		// In render:
+		<Suspense fallback={<ModuleLoader />}>
+		  {currentView === 'projects' && <ProjectsView />}
+		</Suspense>
+		```
+
+	**Effort:** Low | **Impact:** High (faster initial load)
+
+	### 5. **Break Down Large Modules**
+
+		Your Settings module is 2,499 lines and Projects is 1,362 lines. This hurts maintainability.
+
+		**Suggested structure for Settings:**
+		```
+		modules/Settings/
+		├── SettingsView.tsx        # Main shell (100 lines)
+		├── tabs/
+		│   ├── ProfileTab.tsx
+		│   ├── UsersTab.tsx
+		│   ├── AppearanceTab.tsx
+		│   ├── CategoriesTab.tsx
+		│   ├── CurrencyTab.tsx
+		│   └── DataTab.tsx
+		├── components/
+		│   ├── UserForm.tsx
+		│   ├── CategoryEditor.tsx
+		│   └── ThemePicker.tsx
+		└── index.ts
+		```
+		**Effort:** Medium | **Impact:** Medium (maintainability)
+
+	### 6. **Add Global State Management**
+
+		You're passing data through props and using `useFirestore` in every component. Consider a lightweight store:
+
+		```tsx
+		// stores/useAppStore.ts (using Zustand)
+		import { create } from 'zustand';
+
+		export const useAppStore = create((set) => ({
+		  currentView: 'dashboard',
+		  viewParams: {},
+		  navigate: (view, params) => set({ currentView: view, viewParams: params }),
+		  
+		  // Cached settings
+		  settings: null,
+		  setSettings: (settings) => set({ settings }),
+		}));
+		```
+		This eliminates prop drilling and makes navigation cleaner.
+		**Effort:** Medium | **Impact:** Medium
+
+*********************************************
+## Medium Priority (Features & Polish)
+*********************************************
+
+	### 7. **Add Offline Indicator & Sync Status**
+
+		You have offline persistence but users don't know when they're offline or if data is synced.
+
+		```tsx
+		// components/SyncStatus.tsx
+		const SyncStatus = () => {
+		  const [isOnline, setIsOnline] = useState(navigator.onLine);
+		  const [pendingWrites, setPendingWrites] = useState(0);
+		  // Show: "✓ Synced" | "⏳ Syncing 3 changes" | "📴 Offline"
+		};
+		```
+		**Effort:** Low | **Impact:** Medium (user confidence)
+
+	### 8. **Implement the Account-Based Architecture**
+
+		Your attached prompts show plans for shared accounts. This is a significant but valuable change:
+
+		```
+		Current:  users/{userId}/projects/...
+		Future:   accounts/{accountId}/projects/...
+		          users/{userId}/accountIds: ['acc-1', 'acc-2']
+		```
+
+		**Benefits:**
+		- True multi-user collaboration
+		- Family/team shared data
+		- Cleaner permission model
+
+		**Effort:** High | **Impact:** High
+
+	### 9. **Add Undo/Redo for Critical Actions**
+
+		Deleting a project or journal entry is permanent. Add a soft-delete or undo system:
+
+		```tsx
+		// Option A: Soft delete with 30-day retention
+		{ isDeleted: true, deletedAt: timestamp }
+
+		// Option B: Toast with undo action
+		toast({
+		  message: "Project deleted",
+		  action: { label: "Undo", onClick: () => restoreProject(id) }
+		});
+		```
+		**Effort:** Medium | **Impact:** Medium (data safety)
+
+	### 10. **Add Keyboard Navigation**
+
+		You have a Command Palette (⌘K) which is great. Extend it:
+
+		```tsx
+		// Keyboard shortcuts to add:
+		⌘K          - Search (already exists)
+		⌘N          - New item (context-aware)
+		⌘1-9        - Quick switch modules
+		⌘S          - Save current form
+		⌘Z          - Undo
+		Escape      - Close modals
+		↑↓          - Navigate lists
+		Enter       - Select/open
+		```
+		**Effort:** Medium | **Impact:** Medium (power users love this)
+
+*********************************************
+## Nice to Have (Future Enhancements)
+*********************************************
+
+	### 11. **Progressive Web App (PWA)**
+
+		Add a service worker and manifest for mobile installation:
+
+		```json
+		// public/manifest.json
+		{
+		  "name": "LifeOS",
+		  "short_name": "LifeOS",
+		  "start_url": "/",
+		  "display": "standalone",
+		  "theme_color": "#3b82f6"
+		}
+		```
+		**Effort:** Low | **Impact:** Medium (mobile experience)
+
+	### 12. **Push Notifications for Reminders**
+
+		Your `ProjectItem` has a `reminder` field but no notification system:
+
+		```tsx
+		// Using Firebase Cloud Messaging
+		- Request notification permission on login
+		- Store FCM token in user profile
+		- Cloud Function triggers notifications at reminder time
+		```
+		**Effort:** High | **Impact:** Medium
+
+	### 13. **Add Data Visualization to Reports**
+
+		Your ReportsView is only 275 lines - the smallest module. Enhance it with:
+
+		- Spending trends over time (line chart)
+		- Category breakdown (pie chart)
+		- Habit completion heatmap (like GitHub contributions)
+		- Project velocity metrics
+		- Journal mood trends
+
+		Use Recharts (already common in React apps) or Chart.js.
+		**Effort:** Medium | **Impact:** Medium (insights value)
+
+	### 14. **Implement Search Indexing**
+
+		Your current search iterates through all items. For larger datasets, consider:
+
+		```tsx
+		// Option A: Firestore composite indexes + queries
+		// Option B: Algolia/Typesense integration
+		// Option C: Local search index (e.g., Lunr.js)
+		```
+		**Effort:** Medium-High | **Impact:** Medium (scales better)
+
+	### 15. **Add Testing**
+
+		No tests exist currently. Start with:
+
+		```
+		Priority 1: Critical paths
+		- Authentication flow
+		- CRUD operations in useFirestore
+		- Financial calculations
+
+		Priority 2: UI components
+		- Form validation
+		- Modal interactions
+
+		Priority 3: Integration tests
+		- Module data flows
+		```
+
+		Use Vitest (pairs well with Vite) + React Testing Library.
+		**Effort:** High (ongoing) | **Impact:** High (reliability)
+
+
+============================================================================================================================================================
+
+
+---
+
+# ✅ **REPLIT PROMPT — COPY/PASTE**
+
+**ROLE:**
+You are working inside the LifeOSv4 project (React + TypeScript + Vite + Firestore).
+Follow the existing folder structure and coding patterns.
+
+---
+
+# 🚀 **TASK: Implement Shared Accounts, Module Sharing, Item Sharing, Timing System, and Dashboard Integration in LifeOSv4**
+
+I need you to integrate the following features into the current codebase **with minimal disruption**, using the existing modules, components, contexts, and Firestore services:
+
+---
+
+# 🔐 **1. ACCOUNT SYSTEM**
+
+Add support for multiple accounts under one Firebase project.
+
+Each user has:
+
+```
+users/{uid}:
+{
+  role: "super-admin" | "admin" | "user",
+  accounts: [accountId1, accountId2]
+}
+```
+
+Each account has:
+
+```
+accounts/{accountId}:
+{
+  name: string,
+  members: [uids],
+  createdAt,
+  createdBy
+}
+```
+
+Users must operate inside a **currentAccount** context.
+All module data must be stored under:
+
+```
+accounts/{accountId}/{moduleName}/...
+```
+
+---
+
+# 🧩 **2. MODULE-LEVEL SHARING (admin-controlled)**
+
+Add a panel in:
+
+```
+modules/settings/system/SharingParameters.tsx
+```
+
+An admin chooses the sharing mode per module:
+
+```
+"full" | "partial" | "private"
+```
+
+Save to:
+
+```
+accounts/{accountId}/settings/sharing
+```
+
+### Behavior:
+
+* **full** → all users see all items
+* **partial** → users see their items + items with sharedWith including them
+* **private** → users see only items they created
+
+---
+
+# 👥 **3. ITEM-LEVEL SHARING**
+
+Every module item must support:
+
+```
+createdBy: uid
+sharedWith: [uids]
+assignedTo?: uid | null
+```
+
+Apply this to:
+
+* groceries
+* purchases
+* quickNotes
+* projects & tasks
+* itineraries
+* places
+* documents
+* debts & credits
+
+Update Firestore reads so visibility respects module-level rules + item-level sharing.
+
+---
+
+# 🗑 **4. USER DELETION FLOW**
+
+When the admin deletes a user:
+
+### Show a confirmation modal with 3 options:
+
+1. **Delete user AND all their data**
+
+   * delete all items where createdBy = uid
+   * remove from accounts
+   * delete Firebase Auth user
+
+2. **Delete user but KEEP their data**
+
+   * keep items but set:
+
+     ```
+     createdBy: "deleted-user"
+     ownedByUserWasDeleted: true
+     ```
+   * remove membership
+
+3. **Export user data** (JSON) before deletion
+
+Super-admin account cannot be deleted.
+Admin cannot delete themselves.
+
+---
+
+# ⏱ **5. TIMING SYSTEM FOR GROCERIES, PURCHASES, AND QUICK NOTES**
+
+Add a field:
+
+```
+urgency: "today" | "tomorrow" | "dayAfter" | "thisWeek" | "30days" | "none" | "date"
+dueDate: timestamp | null
+```
+
+Create a normalizer function:
+
+```
+normalizeUrgencyToDate(urgency) → dueDate
+```
+
+This must update whenever urgency changes.
+
+UI options:
+
+* Today
+* Tomorrow
+* Day After Tomorrow
+* This Week
+* Within 30 Days
+* No urgency
+* Pick a date
+
+Add this to item editors in:
+
+* modules/groceries
+* modules/purchases
+* modules/quickNotes
+
+---
+
+# 📅 **6. DASHBOARD INTEGRATION**
+
+The dashboard needs a unified task stream compiled from:
+
+* projects/tasks
+* groceries
+* purchases
+* quick notes
+* itineraries
+* documents with expiration
+* financial reminders
+
+Use dueDate to sort items into:
+
+### **Dashboard Sections**
+
+* Search
+* Today
+* Assigned To Me
+* Upcoming
+* No urgency
+
+### Rules:
+
+* Items assignedTo = currentUser go into "Assigned To Me"
+* Items due today → Today
+* Items due tomorrow → Tomorrow
+* Items due after that → Upcoming
+* If no dueDate → No urgency
+
+---
+
+# 👁 **7. CROSS-USER VISIBILITY IN MODULES**
+
+Inside each module:
+
+Add filters:
+
+```
+[ All ] [ Mine ] [ Shared With Me ] [ Assigned To Me ]
+```
+
+Each item visually shows:
+
+```
+Created by: <username>
+Shared with: [...]
+Assigned to: <username or none>
+```
+
+---
+
+# 🧱 **8. IMPLEMENTATION DETAILS**
+
+* Use the existing Firestore service files (`services/firestore.ts`, etc.)
+* Follow the patterns used in current modules
+* Add missing contexts if needed:
+
+  * AccountContext
+  * SharingSettingsContext
+* Keep all components strongly typed (TypeScript strict mode)
+* Don’t break existing modules — integrate smoothly
+* Use existing modal + input components
+* Maintain Replit’s coding style, hooks, and component structure
+* Avoid rewriting modules unless absolutely required
+
+---
+
+# 🧨 **9. DO NOT CHANGE**
+
+* Auth flow
+* Basic module UI layouts
+* Routing structure
+* File/folder organization
+
+Only extend functionality.
+
+---
+
+# 🟢 **BEGIN IMPLEMENTATION**
+
+You now have the full specification.
+Apply these features to the LifeOSv4 codebase step-by-step, modifying only the necessary files.
+
+---
+
+# END OF PROMPT

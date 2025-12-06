@@ -1,0 +1,134 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user owns the document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Helper function to check if user is admin (check userProfiles)
+    function isAdmin() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/userProfiles/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/userProfiles/$(request.auth.uid)).data.role == 'Admin';
+    }
+    
+    // Helper function to check if user is system admin
+    function isSystemAdmin() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/userProfiles/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/userProfiles/$(request.auth.uid)).data.isSystemAdmin == true;
+    }
+    
+    // User profiles - users can read/write their own profile, admins can read all
+    match /userProfiles/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isOwner(userId) || isSystemAdmin();
+      allow delete: if isSystemAdmin() && userId != request.auth.uid;
+    }
+    
+    // User data collections - stored under users/{userId}/{collection}/{document}
+    // This is the main data structure used by the app
+    match /users/{userId}/{collection}/{document=**} {
+      // Users can read and write their own data
+      allow read, write: if isOwner(userId);
+      
+      // Admins can read any user's data for management purposes
+      allow read: if isAdmin();
+    }
+    
+    // Settings collection - readable by authenticated users, writable by admins only
+    match /settings/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || isSystemAdmin();
+    }
+    
+    // Legacy root collections (for backward compatibility during migration)
+    // These rules allow owner-based access to root-level collections
+    match /projects/{docId} {
+      allow read: if isAuthenticated() && (resource.data.owner == request.auth.uid || isAdmin());
+      allow write: if isAuthenticated() && (resource.data.owner == request.auth.uid || !exists(/databases/$(database)/documents/projects/$(docId)));
+    }
+    
+    match /groceries/{docId} {
+      allow read: if isAuthenticated() && (resource.data.owner == request.auth.uid || isAdmin());
+      allow write: if isAuthenticated() && (resource.data.owner == request.auth.uid || !exists(/databases/$(database)/documents/groceries/$(docId)));
+    }
+    
+    match /purchases/{docId} {
+      allow read: if isAuthenticated() && (resource.data.owner == request.auth.uid || isAdmin());
+      allow write: if isAuthenticated() && (resource.data.owner == request.auth.uid || !exists(/databases/$(database)/documents/purchases/$(docId)));
+    }
+    
+    match /financial/{docId} {
+      allow read: if isAuthenticated() && (resource.data.owner == request.auth.uid || isAdmin());
+      allow write: if isAuthenticated() && (resource.data.owner == request.auth.uid || !exists(/databases/$(database)/documents/financial/$(docId)));
+    }
+    
+    match /journal/{docId} {
+      allow read: if isAuthenticated() && (resource.data.owner == request.auth.uid || isAdmin());
+      allow write: if isAuthenticated() && (resource.data.owner == request.auth.uid || !exists(/databases/$(database)/documents/journal/$(docId)));
+    }
+    
+    match /places/{docId} {
+      allow read: if isAuthenticated() && (resource.data.owner == request.auth.uid || isAdmin());
+      allow write: if isAuthenticated() && (resource.data.owner == request.auth.uid || !exists(/databases/$(database)/documents/places/$(docId)));
+    }
+    
+    match /habits/{docId} {
+      allow read: if isAuthenticated() && (resource.data.owner == request.auth.uid || isAdmin());
+      allow write: if isAuthenticated() && (resource.data.owner == request.auth.uid || !exists(/databases/$(database)/documents/habits/$(docId)));
+    }
+    
+    match /goals/{docId} {
+      allow read: if isAuthenticated() && (resource.data.owner == request.auth.uid || isAdmin());
+      allow write: if isAuthenticated() && (resource.data.owner == request.auth.uid || !exists(/databases/$(database)/documents/goals/$(docId)));
+    }
+    
+    match /itineraries/{docId} {
+      // Standard authenticated access - owners and admins
+      allow read: if isAuthenticated() && (resource.data.owner == request.auth.uid || isAdmin());
+      allow write: if isAuthenticated() && (resource.data.owner == request.auth.uid || !exists(/databases/$(database)/documents/itineraries/$(docId)));
+    }
+    
+    // Public itinerary shares - separate collection for security
+    // Public copies are stored as /publicItineraries/{shareToken}
+    match /publicItineraries/{shareToken} {
+      // Anyone can read if it exists and is marked public
+      allow read: if resource.data.isPublic == true;
+      // Create: only owner can create, and must be marked public
+      allow create: if isAuthenticated() 
+        && request.resource.data.owner == request.auth.uid 
+        && request.resource.data.isPublic == true;
+      // Update: only owner can update their own shares
+      allow update: if isAuthenticated() 
+        && resource.data.owner == request.auth.uid 
+        && request.resource.data.owner == request.auth.uid;
+      // Delete: only owner can delete their own shares
+      allow delete: if isAuthenticated() && resource.data.owner == request.auth.uid;
+    }
+    
+    match /templates/{docId} {
+      allow read: if isAuthenticated() && (resource.data.owner == request.auth.uid || isAdmin());
+      allow write: if isAuthenticated() && (resource.data.owner == request.auth.uid || !exists(/databases/$(database)/documents/templates/$(docId)));
+    }
+    
+    match /documents/{docId} {
+      allow read: if isAuthenticated() && (resource.data.owner == request.auth.uid || isAdmin());
+      allow write: if isAuthenticated() && (resource.data.owner == request.auth.uid || !exists(/databases/$(database)/documents/documents/$(docId)));
+    }
+    
+    match /loans/{docId} {
+      allow read: if isAuthenticated() && (resource.data.owner == request.auth.uid || isAdmin());
+      allow write: if isAuthenticated() && (resource.data.owner == request.auth.uid || !exists(/databases/$(database)/documents/loans/$(docId)));
+    }
+  }
+}

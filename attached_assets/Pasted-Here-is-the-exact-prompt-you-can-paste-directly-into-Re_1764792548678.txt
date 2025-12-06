@@ -1,0 +1,262 @@
+Here is the **exact prompt** you can paste directly into **Replit AI**.
+It is written to be perfectly clear, actionable, and aligned with the features you requested — **shared users, timing system, account/module sharing, user deletion behavior, and dashboard integration** — while allowing Replit to work within your current LifeOSv4 codebase.
+
+---
+
+# ✅ **REPLIT PROMPT — COPY/PASTE**
+
+**ROLE:**
+You are working inside the LifeOSv4 project (React + TypeScript + Vite + Firestore).
+Follow the existing folder structure and coding patterns.
+
+---
+
+# 🚀 **TASK: Implement Shared Accounts, Module Sharing, Item Sharing, Timing System, and Dashboard Integration in LifeOSv4**
+
+I need you to integrate the following features into the current codebase **with minimal disruption**, using the existing modules, components, contexts, and Firestore services:
+
+---
+
+# 🔐 **1. ACCOUNT SYSTEM**
+
+Add support for multiple accounts under one Firebase project.
+
+Each user has:
+
+```
+users/{uid}:
+{
+  role: "super-admin" | "admin" | "user",
+  accounts: [accountId1, accountId2]
+}
+```
+
+Each account has:
+
+```
+accounts/{accountId}:
+{
+  name: string,
+  members: [uids],
+  createdAt,
+  createdBy
+}
+```
+
+Users must operate inside a **currentAccount** context.
+All module data must be stored under:
+
+```
+accounts/{accountId}/{moduleName}/...
+```
+
+---
+
+# 🧩 **2. MODULE-LEVEL SHARING (admin-controlled)**
+
+Add a panel in:
+
+```
+modules/settings/system/SharingParameters.tsx
+```
+
+An admin chooses the sharing mode per module:
+
+```
+"full" | "partial" | "private"
+```
+
+Save to:
+
+```
+accounts/{accountId}/settings/sharing
+```
+
+### Behavior:
+
+* **full** → all users see all items
+* **partial** → users see their items + items with sharedWith including them
+* **private** → users see only items they created
+
+---
+
+# 👥 **3. ITEM-LEVEL SHARING**
+
+Every module item must support:
+
+```
+createdBy: uid
+sharedWith: [uids]
+assignedTo?: uid | null
+```
+
+Apply this to:
+
+* groceries
+* purchases
+* quickNotes
+* projects & tasks
+* itineraries
+* places
+* documents
+* debts & credits
+
+Update Firestore reads so visibility respects module-level rules + item-level sharing.
+
+---
+
+# 🗑 **4. USER DELETION FLOW**
+
+When the admin deletes a user:
+
+### Show a confirmation modal with 3 options:
+
+1. **Delete user AND all their data**
+
+   * delete all items where createdBy = uid
+   * remove from accounts
+   * delete Firebase Auth user
+
+2. **Delete user but KEEP their data**
+
+   * keep items but set:
+
+     ```
+     createdBy: "deleted-user"
+     ownedByUserWasDeleted: true
+     ```
+   * remove membership
+
+3. **Export user data** (JSON) before deletion
+
+Super-admin account cannot be deleted.
+Admin cannot delete themselves.
+
+---
+
+# ⏱ **5. TIMING SYSTEM FOR GROCERIES, PURCHASES, AND QUICK NOTES**
+
+Add a field:
+
+```
+urgency: "today" | "tomorrow" | "dayAfter" | "thisWeek" | "30days" | "none" | "date"
+dueDate: timestamp | null
+```
+
+Create a normalizer function:
+
+```
+normalizeUrgencyToDate(urgency) → dueDate
+```
+
+This must update whenever urgency changes.
+
+UI options:
+
+* Today
+* Tomorrow
+* Day After Tomorrow
+* This Week
+* Within 30 Days
+* No urgency
+* Pick a date
+
+Add this to item editors in:
+
+* modules/groceries
+* modules/purchases
+* modules/quickNotes
+
+---
+
+# 📅 **6. DASHBOARD INTEGRATION**
+
+The dashboard needs a unified task stream compiled from:
+
+* projects/tasks
+* groceries
+* purchases
+* quick notes
+* itineraries
+* documents with expiration
+* financial reminders
+
+Use dueDate to sort items into:
+
+### **Dashboard Sections**
+
+* Search
+* Today
+* Assigned To Me
+* Upcoming
+* No urgency
+
+### Rules:
+
+* Items assignedTo = currentUser go into "Assigned To Me"
+* Items due today → Today
+* Items due tomorrow → Tomorrow
+* Items due after that → Upcoming
+* If no dueDate → No urgency
+
+---
+
+# 👁 **7. CROSS-USER VISIBILITY IN MODULES**
+
+Inside each module:
+
+Add filters:
+
+```
+[ All ] [ Mine ] [ Shared With Me ] [ Assigned To Me ]
+```
+
+Each item visually shows:
+
+```
+Created by: <username>
+Shared with: [...]
+Assigned to: <username or none>
+```
+
+---
+
+# 🧱 **8. IMPLEMENTATION DETAILS**
+
+* Use the existing Firestore service files (`services/firestore.ts`, etc.)
+* Follow the patterns used in current modules
+* Add missing contexts if needed:
+
+  * AccountContext
+  * SharingSettingsContext
+* Keep all components strongly typed (TypeScript strict mode)
+* Don’t break existing modules — integrate smoothly
+* Use existing modal + input components
+* Maintain Replit’s coding style, hooks, and component structure
+* Avoid rewriting modules unless absolutely required
+
+---
+
+# 🧨 **9. DO NOT CHANGE**
+
+* Auth flow
+* Basic module UI layouts
+* Routing structure
+* File/folder organization
+
+Only extend functionality.
+
+---
+
+# 🟢 **BEGIN IMPLEMENTATION**
+
+You now have the full specification.
+Apply these features to the LifeOSv4 codebase step-by-step, modifying only the necessary files.
+
+---
+
+# END OF PROMPT
+
+---
+
+If you want, I can also give you a **step-by-step version** or a **smaller phased prompt** to feed Replit in chunks.

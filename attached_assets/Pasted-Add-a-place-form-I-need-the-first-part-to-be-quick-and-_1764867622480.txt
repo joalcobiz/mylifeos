@@ -1,0 +1,27 @@
+Add a place form
+	I need the first part to be quick and efficient to look up a place ussing google
+	Also, give the option to enter a name / description / city quick entry from for later update (a draft of sorts) - we can sometimes be on the road, with poor cell signal but would like to be able to make a quick entry. 
+	Redesign the form so that when searching in google, I can see the different options. Collapse everything else until the 
+	I would like a way to 'create an itenerary' and select one or multiple locations from within here and then create an itinerary. This would be a type of itenerary called something like 'unscheduled' where I could go to later and set visit days for each of the stops and create a fully functional itinerary
+	I shluld also have an option to 'plan visit', or if already visited, 'add visit'. Keep a history of every visit, with notes and attachments for every stop.
+	Also need a full/compact view
+
+Itinirary
+	I can only create two trips
+	I need instructions on the screen as to how to create an itinerary
+	While switching the status from 'planned' to 'completed' I got no prompts and I cannot change it back. This is confusing.
+	When adding an itinerary without fixed dates, it should be clasiffied as 'unplanned'
+	When manual, use google search to find the place or address
+	Flexible time mode field must be bigger so that selected text doesn't get cutoff
+	Remove quick select time of day section.
+	Use Quick select icon next to time, whether fixed or flexible
+	Remove duration field
+	Remove estimated cost
+	remove booking URL
+	allow me to edit planned stops
+	I should not be able to move a planned stop that has a date or time to a spot with a date or time before. The logic applies only to stops within the same 'time slots' (Early, morning, midday etc)
+	The planned stops section during creation should be grouped by days and be much more compact (one line) 
+	I should be able to add notes and images to each stop. 
+	Vastly improve layout of PDF export to be much more elegant and compact and easy to read
+	Normal view wastes too much space. Move progress bar to 
+	Make UI moer compact and intuitive without loosing its elegance

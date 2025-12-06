@@ -1,0 +1,114 @@
+General
+	The input form works just fine in Places Module. It does not in most other modules
+
+Desktop
+
+		
+Calendar
+	The cards are a little too strong. Remove color from the borders.
+	I do not see an entry for itineraries. Since a visit to a place becomes an entry into trips, I think we should see Itineraries instead.
+	Rename Itineraries to Trips
+
+Fiancial
+	Keep history of balance changes. 
+
+Journal
+	Improve look of input form
+	For current location, improve details so that its not just 'city name'. Make date field smaller (half its current size) so that this field can be larger and fit more info
+
+Itinerary
+	The location name can be a manually entered random name, or a google search for a place. Give me option to do both. I did not see the google functionality working.
+	Separate stops by day. Make easy to move from one day to the next
+
+Places
+	Rename to Places & Events
+	Entry form does not look as nice as the others. Make it look as nice.
+	I still don't get a set of options in the dropdwn when I click on find (why) so that I can confirm which entry I want
+	Add 'Discover Nearby' button for each place, after created - in a section above 'dates, events & best times' - so that I can add it.
+	Add a COUNTRY field
+
+Groceries
+	Grocery shopping can take place in different places. Allow me to either enter or search places with google, and then save it as a place with a supermarket tag which I can later retrieve from the dropdown with the name of the place and the city or town where it is. There are publix supermarkets everywhere. 
+	I could also group these items together by selecting (checkbox or similar) several or all of them and create an itinirary based on the grouped supermarket locations
+
+Shopping
+	Follow the same logic as in groceries.
+
+Collections
+	Redesign the Collections Module. The form looks plain.
+	Recreate all the collections. Add a 'Add to Shopping List' option for each entry. 
+
+Settings
+	Firebase
+		** Remove the record counts for the modules
+		** Create the following admin panel ***
+		## **1. Connection Status**
+		Shows whether the client is connected to Firestore.
+		* **Connected / Syncing / Offline**
+		* Last successful sync timestamp
+		* Pending writes count
+		Useful for diagnosing network issues or offline mode.
+		---
+		## **2. Firebase Project Info**
+		This is non-sensitive and safe because it’s already in the client bundle.
+		* **Project ID**
+		* **Storage Bucket**
+		* **Auth Domain**
+		* **App ID**
+		* **Measurement ID**
+		These help confirm the user is on the correct Firebase project (vs a dev or staging project).
+		---
+		## **3. Firestore Health & Activity**
+		Show:
+		* Last read time
+		* Last write time
+		* Number of successful writes
+		* Number of failed writes
+		* Firestore latency (ms between request and response)
+		This helps debug connection issues.
+		---
+		## **4. Local Persistence Status**
+		Show whether offline persistence is enabled:
+		* **IndexedDB active**
+		* **Pending local writes**
+		* **Cached documents count**
+		This helps diagnose data not syncing.
+		---
+		## **5. Authentication Info**
+		Only safe details:
+		* User UID
+		* Auth provider (email/password, Google, etc)
+		* Last login timestamp
+		* Is anonymous? yes/no
+		Never show tokens, refresh tokens, or email verification links.
+		---
+		## **6. Realtime Listener Status**
+		For apps using `onSnapshot()`:
+		* Listener active? yes/no
+		* Number of listeners
+		* Last update received
+		* Errors logged
+		Useful for diagnosing realtime update issues.
+		---
+		## **7. Cloud Storage Connectivity (Optional)**
+		Show:
+		* Last file upload success
+		* Last file download success
+		* Storage bucket path
+		Useful if your Documents module uploads images or PDFs.
+		---
+		## **8. Cloud Functions (Optional)**
+		If your app uses Functions:
+		* Last function call
+		* Function name
+		* Status (success/error)
+		* Latency (ms)
+		Helps catch problems such as rate limits or errors.
+		---
+		## **9. Error Logs**
+		Keep a non-sensitive history of:
+		* Firestore errors
+		* Auth errors
+		* Storage upload/download errors
+		* Local persistence failures
+		* Realtime listener failures

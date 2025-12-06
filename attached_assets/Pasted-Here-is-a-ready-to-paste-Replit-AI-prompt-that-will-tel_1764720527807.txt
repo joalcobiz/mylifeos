@@ -1,0 +1,201 @@
+Here is a **ready-to-paste Replit AI prompt** that will tell Replit exactly how your app works, what the architecture is, and what rules it must follow — while still giving it enough flexibility to make small improvements or adjustments based on your existing codebase.
+
+You can copy/paste this **as-is** into Replit’s “Ghostwriter Prompt” or “Explain task” box.
+
+---
+
+# ✅ **THE PERFECT REPLIT PROMPT FOR YOUR APP**
+
+**Copy everything below:**
+
+---
+
+**PROMPT FOR REPLIT AI (GHOSTWRITER)**
+You are helping me build a personal operating system app called **LifeOS** using **React + TypeScript + Vite + Firebase**.
+The codebase lives in Replit, so follow the existing folder structure and conventions that are already there.
+You may make small adjustments or refactors, but do NOT break the architecture or remove required modules.
+
+---
+
+## **🔥 Architecture Requirements**
+
+### **1. The app uses Firebase with the following structure:**
+
+* One **super-admin** account (hardcoded, cannot be deleted)
+* One **admin** account (can create users and accounts)
+* Admin can choose whether a new user belongs to:
+
+  * an **individual account**, or
+  * a **shared account** with multiple members
+
+### **2. Firestore must follow this structure:**
+
+```
+accounts/{accountId}/[modules...]
+users/{uid}
+```
+
+Each account is a “container” for data:
+
+```
+accounts/{accountId}/projects
+accounts/{accountId}/places
+accounts/{accountId}/journal
+accounts/{accountId}/documents
+accounts/{accountId}/collections
+accounts/{accountId}/calendars
+accounts/{accountId}/debts
+...
+```
+
+Users contain a list of account IDs they belong to.
+
+---
+
+## **🔥 Admin Flow Requirements**
+
+The Admin UI must support:
+
+### **• Create New User**
+
+Fields:
+
+* Full name
+* Email
+* Password
+* Account type:
+
+  * Individual
+  * Shared
+    If Shared: allow adding other existing users as members.
+
+### **• Manage Users**
+
+List users, their accounts, roles, membership, and allow:
+
+* Reset password
+* Add/remove from accounts
+* View details
+
+### **• Manage Accounts**
+
+List all accounts and members, allow:
+
+* Add/remove members
+* View modules inside that account
+
+### **• Super-admin constraints**
+
+* Super-admin cannot be deleted
+* Super-admin not editable by admin
+* Super-admin always has permission
+
+---
+
+## **🔥 Modules inside each Account**
+
+LifeOS modules stored inside `/accounts/{accountId}` include:
+
+* Projects + Tasks
+* Calendar
+* Reports
+* Journal
+* Places
+* Itineraries
+* Shopping
+* Groceries
+* Collections
+* Documents
+* Debts / Credits
+
+Modules may cross-reference each other (e.g., Itinerary → Place).
+IDs must be unique within the account, not globally.
+
+---
+
+## **🔥 Requirements for Replit AI**
+
+When making changes, follow these rules:
+
+### ✔ Respect the existing infrastructure
+
+Adjust code instead of rewriting it unless necessary.
+
+### ✔ Maintain TypeScript typing
+
+All new React components, hooks, and Firebase utilities should be typed.
+
+### ✔ Keep UI simple and clean
+
+Prefer minimal, functional, admin-friendly layouts.
+
+### ✔ Follow the new architecture
+
+Do not put module data under `users/{uid}` — everything goes under an `accountId`.
+
+### ✔ Optimize Firestore reads
+
+Use listeners sparingly and avoid deeply nested realtime subscriptions.
+
+### ✔ Provide working code
+
+When generating new files, provide:
+
+* imports
+* exports
+* component structure
+* TS types
+* Firebase queries
+
+### ✔ Explain where each file goes
+
+(e.g., `src/components/admin/CreateUserForm.tsx`)
+
+---
+
+## **🔥 What Replit AI is allowed to do**
+
+* Small refactors
+* Fix broken handling of state, props, routing
+* Adjust Firebase queries to fit the new structure
+* Improve code readability
+* Add missing types
+* Create new components
+
+---
+
+## **🔥 What Replit AI should NOT do**
+
+* Replace the entire project
+* Delete major modules
+* Remove the account-container architecture
+* Modify security-sensitive auth rules incorrectly
+* Add external libraries without asking
+* Rewrite Firebase config structure
+
+---
+
+## **🔥 When I ask you for something, you should:**
+
+1. Analyze the existing code in Replit
+2. Respect the architecture and rules above
+3. Suggest minimal changes
+4. Output updated or new code files
+5. Provide explanations of what changed and why
+
+---
+
+**You are now the AI assistant responsible for maintaining and expanding the LifeOS app in the Replit environment while preserving this architecture.**
+
+---
+
+# 🎉 Done.
+
+If you'd like, I can generate:
+
+* A “super-admin bootstrap script”
+* The minimal Firestore rules compatible with this setup
+* A Replit `.replit` + `replit.nix` config
+* A startup index for routing all admin pages
+
+Just tell me what you want next.

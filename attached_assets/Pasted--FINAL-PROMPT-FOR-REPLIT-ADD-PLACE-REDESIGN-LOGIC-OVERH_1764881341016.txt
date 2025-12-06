@@ -1,0 +1,211 @@
+ ✅ **FINAL PROMPT FOR REPLIT — “ADD PLACE” REDESIGN & LOGIC OVERHAUL**
+
+**Goal:**
+Redesign the **Add Place** form so it matches the visual quality and UX of the other input modals (Trips, Journal, Expenses) and adds a robust Google Places search workflow + clean manual entry mode + draft/incomplete indicators.
+
+---
+
+# **🔧 Layout & UI Requirements**
+
+### **1. Match the style of existing modal forms**
+
+Use the same structure as:
+
+* **Plan New Trip**
+* **New Journal Entry**
+* **Add Expense**
+
+Meaning:
+
+* White background card sections
+* Clear colored section headers with icons
+* Consistent spacing, rounded corners, and fonts
+* No rainbow/gradient section bars unless consistent with app
+
+The design must visually integrate with the existing UI system.
+
+---
+
+# **🔍 Search Mode Controls (Q4-B)**
+
+### **2. The location input uses a segmented toggle INSIDE the search bar:**
+
+```
+| Google | Manual |
+```
+
+Selecting “Google” enables Google mode.
+Selecting “Manual” enables minimal manual entry mode.
+
+This toggle lives inside the location search bar (aligned right).
+
+---
+
+# **🟣 GOOGLE MODE — Full Search Flow**
+
+### **3. Google search happens in the main search bar**
+
+* Type triggers Google Places API autocomplete
+* Show results in a **dropdown list** with:
+
+  * Place name
+  * Address
+  * Type
+  * Rating (if available)
+
+### **4. When a result is selected**
+
+* Collapse/gray out unused form sections until selection is made
+* Show a **Google preview panel** directly under the search bar:
+
+  * Name
+  * Full formatted address
+  * Website
+  * Phone
+  * Open hours
+  * Coordinates
+  * Google rating + reviews count
+  * “View on Google Maps” link
+
+### **5. Autofill the full form**
+
+* Name
+* Address fields
+* City / State / Country
+* Latitude / Longitude
+* Website
+* Phone
+* Type (restaurant, attraction, etc.)
+
+### **6. User can override autofilled fields manually**
+
+### **7. Duplicate detection**
+
+Before saving:
+
+* Compare with existing places by:
+
+  * Name similarity
+  * Address similarity
+  * Coordinates proximity
+  * Place ID match
+
+If duplicates found → show modal:
+
+* “This place seems similar to an existing place.”
+* Options: **View existing** or **Continue anyway**
+
+---
+
+# **✏️ MANUAL ENTRY MODE — Simple, Fast, Draft-Friendly**
+
+### **8. Manual mode actions**
+
+* Only one required field: **Name**
+* All other fields optional
+* No validation beyond Name
+* Must save even without address/network
+
+### **9. Fields visible in manual mode**
+
+Minimal:
+
+* Name
+* Notes (optional)
+* Button: “Convert to Google-powered entry later”
+
+### **10. Manual → Google mode switch (Q5 behavior)**
+
+When switching **from Manual → Google mode**:
+
+* A Google search bar appears
+* The manual Name is **moved into Notes (append, do not overwrite)**
+* Google autofill overrides fields
+* Show warning toast:
+  “Manual name moved to Notes to preserve your input.”
+
+### **11. Mark saved manual entries as “Draft / Incomplete”**
+
+* Show a **yellow badge: “INCOMPLETE”**
+* Badge appears in:
+
+  * Places list
+  * Edit Place modal
+  * Any module referencing this place
+
+---
+
+# **🗂 Form Sections (match existing UI style)**
+
+### **Section 1 — Place Info**
+
+* Name
+* Type (dropdown)
+* Rating (stars, optional)
+
+### **Section 2 — Location**
+
+* Address
+* City / State / Country
+* Latitude / Longitude
+* “Use current location” button (optional)
+
+### **Section 3 — Additional Info**
+
+* Website
+* Notes (includes preserved manual name)
+* Phone (optional)
+
+### **Section 4 — Events for this Place**
+
+* Repeating block:
+
+  * Event name
+  * Date or Date Range
+  * “Best time” dropdown: Morning / Afternoon / Evening
+* “+ Add Event” button
+* Uses same card style as Trip Stops UI
+
+---
+
+# **🔥 Conditional UI Behavior**
+
+### **12. Before user selects Google result OR types a manual name**
+
+* Collapse all sections
+* Dim all input fields
+* Show message:
+  “Start by searching Google or enter a place name.”
+
+### **13. After Name or Google selection**
+
+* Expand all sections
+* Show Google preview panel (if applicable)
+
+---
+
+# **🌎 Optional but required in architecture**
+
+* Flag in DB: `isIncomplete: boolean`
+* Timestamp: `updatedFromGoogleAt`
+* Field: `googlePlaceId` (optional)
+* Auto-tag incomplete items in lists
+
+---
+
+# **🧪 Validation Rules**
+
+* Google entries must have address + coordinates
+* Manual entries must have Name only
+* Switching between modes must never delete user data
+
+---
+
+# **📐 Overall Goals**
+
+1. The new Add Place form must visually align with Trip / Journal / Expense modals.
+2. Must be extremely easy to search Google and pick the correct place.
+3. Must support quick offline drafts with a single required field.
+4. Must intelligently upgrade drafts later via Google search.
+5. Must detect duplicates and warn the user.
+6. Must maintain a clean, modern, centered, polished UI.

@@ -1,0 +1,64 @@
+*** Dashboard 
+		- Remove quick add, since we already have the '+' button - replace with a comprehensive 
+		- I added a note with a due date for tomorrow and it did not show in task stream
+		- Make task stream stand out a little bit more. Clickin on any of the records takes you to the task. Task cannot be completed from there
+		- Remove Active projects, monthly income, habits today, active goals small cards
+		- Make sure there is a card for each module (except 'upcoming') that shows the latest updates - below task stream
+		- Global search not working. Clarify that it is a global search, or give me an option to select a module.
+
+	*** Calendar
+		- color icons with white background. Order alphabetically
+		- Add daily, weekday, weekly, list views
+		- Add notes to the calendar
+
+	*** Projects
+		- Move search function above quick notes and include 'notes' in the search options
+		- Add the ability to add notes and attachments to all tasks
+		- There is an issue deleting subtasks
+		- When deleting a project ask for 'type DELETE'
+
+*** Notes
+	- When opening a note, we should have only the two fields on the top with an option to expand
+	- Convert to additional options (Journal,Income,Expense,Grocerie,Shopping item (show lists), place, trip, goal, habit)
+
+*** Journal
+	- remove cards with counts
+	- Allow sorting
+	- latest visit on top by default
+	- add 'categories' and show category instead of tags.  
+	- create grouping option by (category, by month, by city) in both or card view
+
+*** Financial
+	- Expenses & Income
+		- Add field in that convert the amount entered in {USD}. All total are to be converted in the currency selected as the primary currency in the settings. 
+		This applies to the income as well.
+		- Add sorting to the tables. Sorting must always be done by the due date by default, ascending (from the 1st to the 31st)
+		- Add delete button to transactions
+
+*** Groceries
+	- Table view (sortable)
+	- Add fields to table view
+	- Allow table view of all lists in a single table. Add grouping.
+	- Allow costs in any currency. convert it to USD. Display both in table.
+
+*** Shopping
+	- Remove cards (total value, must haves, researched)
+	- Allow creation of multiple shopping lists.
+	- Add reminders for all shopping lists. The reminders can be daily, some days of the week, weekly, monthly, yearly, one time
+
+*** Places form
+	- While addid planned stops, allow me to edit a stop
+
+*** Trip Planner
+	- When one trip is expanded, the others gray out in the backgorund for better visibilty
+	- Remove theme colors selection option from 'edit trip' form
+	- Allow me to edit stops
+	- when adding stops the options should be saved locations & search
+		- 'saved locations' pulls existing saved locations
+		- 'search' replaces manual. However, google search not working.
+
+*** Documents 
+	- Create 20 commonly used categories with a matching icon
+
+*** Collections
+	- Add a reminder for all tasks within each collection. The reminders can be daily, some days of the week, weekly, monthly, yearly, one time

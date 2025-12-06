@@ -1,0 +1,255 @@
+Understood — you now want a **Replit-ready prompt** that tells the AI exactly what to build **on top of your existing codebase** *without rewriting your app.*
+
+This prompt will instruct Replit to:
+
+* Respect your current folder structure
+* Extend—not overwrite—your current Trip module
+* Add new behavior and UI features
+* Keep integration clean with Firebase and LifeOS modules
+
+Below is the **clean, production-grade prompt** you can paste directly into Replit.
+
+---
+
+# ✅ **FINAL PROMPT FOR REPLIT**
+
+*(Paste exactly as-is. This is optimized for Replit’s code-writing model.)*
+
+---
+
+**PROJECT CONTEXT**
+
+This is the LifeOS app. It is a modular Firebase + React SPA with multi-user accounts, shared modules, and a Trips/Itineraries module. All work must integrate into the existing structure without breaking other modules. Follow the existing patterns for Firestore, user IDs, hooks, context, date formatting, icons, and UI components.
+
+Do NOT rewrite the app or restructure folders. Only extend the existing functionality inside the Trips/Itinerary module.
+
+---
+
+# **TASK: IMPLEMENT ADVANCED ITINERARY FEATURES**
+
+### **1. Manual Location Entry (Two Modes)**
+
+Modify the “Manual Entry” option so that it supports:
+
+* **Manual Name Only**
+* **Manual Name + Optional Google Location lookup**
+  Always show the Google search field when using manual mode, but mark it as *optional*.
+  If the user selects a Google result, attach:
+
+```
+googlePlaceId
+latitude
+longitude
+address
+```
+
+Follow existing Firebase shape conventions.
+
+---
+
+### **2. Google Places Integration**
+
+Implement **real** Google Places Autocomplete using the existing API key environment variable.
+Do NOT hardcode the API key.
+Use loadScript + AutocompleteService OR the Maps JavaScript API (whichever fits the current project style).
+
+Autocomplete should populate:
+
+* place name
+* address
+* lat/lng
+
+Saving the stop should store the minimal useful data:
+
+```
+locationName
+googlePlaceId
+coords
+placeAddress
+source: "manual+google" | "places" | "manual"
+```
+
+---
+
+### **3. Time Input Rules**
+
+Users can choose:
+
+* **Fixed Time**
+* **Time-of-Day Bucket**
+
+Buckets must follow the ranges:
+
+Early Morning → 5:00–7:59 (sortKey 06:00)
+Morning → 8:00–11:29 (sortKey 09:00)
+Midday → 11:30–13:00 (sortKey 12:00)
+Early Afternoon → 13:01–15:29 (sortKey 14:00)
+Late Afternoon → 15:30–17:59 (sortKey 16:00)
+Evening → 18:00–20:29 (sortKey 19:00)
+Night → 20:30–23:59 (sortKey 21:30)
+Late Night → 00:00–04:59 (sortKey 02:00)
+
+**Sorting Rules:**
+
+* Fixed times sort strictly by clock time.
+* Bucket times sort by bucket sortKey.
+* If a fixed time falls inside the same bucket range as another bucket stop, allow manual reordering between them.
+* A stop with time “9:00 AM” cannot be reordered before another “9:00 AM" stop. Maintain stability.
+
+Add drag-and-drop **within the same day**, respecting fixed-time ordering rules.
+
+---
+
+### **4. Collapsible Day Sections**
+
+In the “Planned Stops” list:
+
+* Group stops by day
+* Each day block must be collapsible
+* Preserve collapse state in component state
+
+---
+
+### **5. Map Preview for Each Stop**
+
+Add an expandable “Map Preview” section for each stop:
+
+* Use Google Maps iframe or JS SDK
+* Only load map when the user expands the preview (lazy load)
+* If the stop has no coordinates, hide the map button
+
+---
+
+### **6. Public Sharing (Multi-User)**
+
+Add “Share Itinerary” in the Trip header.
+
+When enabled:
+
+* Create a **public, unauthenticated route** at
+  `/share/:tripId`
+* Copy a readonly version of itinerary data into a
+  `sharedItineraries/{tripIdPublic}` doc
+* Include:
+
+  * stops
+  * trip name
+  * dates
+  * map previews
+  * owner display name
+
+Anyone with the link can view the itinerary.
+No authentication required for this route.
+
+Respect Firestore security rules:
+
+* Owners/admins can update or disable sharing
+* Public users: read-only access to shared docs
+
+---
+
+### **7. PDF Export**
+
+Add “Export to PDF” using:
+
+* html2canvas + jsPDF
+  OR
+* A serverless function if already used in project
+
+The PDF should include:
+
+* Trip title
+* Date range
+* Day-by-day grouped stops
+* Stop names + times
+* Map thumbnails (if possible)
+* Trip notes
+
+Use existing styling conventions.
+
+---
+
+### **8. UI Requirements**
+
+The updated Trip Builder UI must:
+
+* Look similar to current LifeOS styling
+* Integrate with existing components (buttons, cards, typography)
+* Use the existing design system variables
+* Maintain mobile responsiveness
+* Avoid introducing new CSS frameworks
+
+---
+
+### **9. Data Model Updates**
+
+Extend the existing Firestore structure minimally.
+Only add fields; do not modify or delete existing ones.
+
+Stops gain:
+
+```
+googlePlaceId?: string
+coords?: { lat: number, lng: number }
+placeAddress?: string
+source: "manual" | "manual+google" | "places"
+timeMode: "fixed" | "bucket"
+time?: string
+bucket?: string
+sortKey: string
+manualOrder?: number
+```
+
+Trips gain:
+
+```
+shared: boolean
+publicShareId?: string
+```
+
+Shared itineraries collection:
+
+```
+sharedItineraries/{publicShareId}
+```
+
+---
+
+### **10. DO NOT BREAK THE EXISTING CODE**
+
+* Do not rewrite the component structure
+* Do not rename existing files unless necessary
+* Do not alter unrelated modules
+* Keep all existing trip creation logic functional
+* Ensure backward compatibility with existing trip documents in Firestore
+
+---
+
+### **11. Final Deliverables**
+
+Replit must produce:
+
+1. Modified React components for the Trips module
+2. New Google Places autocomplete component
+3. Day-grouped, collapsible UI
+4. DnD reordering with time rules
+5. Map preview component
+6. Public share page `/share/:tripId`
+7. PDF export button and logic
+8. All Firestore reading/writing updates
+9. Minimal updates to Firestore rules to allow read-only public access
+
+---
+
+**END OF PROMPT**
+
+---
+
+# If you want, I can also create:
+
+* A version of this prompt **specifically tuned for Claude**
+* A version for **Github Copilot Replit Agent**
+* A **diagram** of the new Trip data model
+* Updated Firestore security rules for sharing
+
+Just tell me.

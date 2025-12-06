@@ -1,0 +1,99 @@
+Here is the **clean bullet-point version** of your Replit prompt.
+No hashes, no headings, no special characters — just clear instructions.
+
+---
+
+• You are working inside the LifeOSv4 project (React, TypeScript, Vite, Firestore).
+• Follow the existing file structure, contexts, modules, and coding style.
+• Implement multi-account support. Each user may belong to one or more accounts.
+• Create a currentAccount context.
+• Store all module data under accounts/{accountId}/{moduleName}/...
+• User document format:
+
+* role: "super-admin" | "admin" | "user"
+* accounts: array of accountIds
+
+• Each account document contains:
+
+* name
+* members
+* createdAt
+* createdBy
+
+• Add a Sharing Parameters screen in the settings module.
+• The admin chooses per-module sharing mode: full, partial, private.
+• Save sharing modes to accounts/{accountId}/settings/sharing.
+• Implement module visibility rules based on sharing mode.
+
+* full: all users see all items
+* partial: users see their items plus items sharedWith them
+* private: users only see their own items
+
+• Add item-level fields for all modules:
+
+* createdBy
+* sharedWith array
+* assignedTo (if applicable)
+
+• Update Firestore queries so users only see items allowed by module sharing mode and item sharing rules.
+
+• Implement user deletion flow.
+• When deleting a user, show a confirmation dialog with three options:
+
+* delete user and delete all their data
+* delete user but keep their data
+* export user data as JSON before deletion
+  • If keeping data, mark items with createdBy set to "deleted-user" and ownedByUserWasDeleted set to true.
+  • Super-admin cannot be deleted.
+  • Admin cannot delete themselves.
+
+• Add a timing system for groceries, purchases, and quick notes.
+• Each item has two fields: urgency and dueDate.
+
+* urgency may be: today, tomorrow, dayAfter, thisWeek, 30days, none, or date
+  • Implement a function that converts urgency into a normalized dueDate.
+  • Update item editors in groceries, purchases, and quick notes to include urgency options.
+  • If user selects "Pick a date", allow a manual date selection.
+
+• Integrate all modules with due dates into the dashboard.
+• Create a unified task stream that merges:
+
+* projects, tasks
+* groceries
+* purchases
+* quick notes
+* itineraries
+* documents with expiration dates
+* debts and credits with due dates
+  • Sort items into the following dashboard sections:
+* search
+* today
+* assigned to me
+* upcoming
+* no urgency
+
+• Items assignedTo the current user appear in the "assigned to me" section.
+• Items due today appear in "today".
+• Items due tomorrow appear in "tomorrow".
+• Items with later due dates go into "upcoming".
+• Items with no dueDate go into "no urgency".
+
+• In every module, add filtering options:
+
+* All
+* Mine
+* Shared With Me
+* Assigned To Me
+
+• Each item shown in a module must display:
+
+* created by
+* shared with list
+* assigned to (if applicable)
+
+• Use existing components, modals, contexts, and Firestore service functions.
+• Keep TypeScript strict typing.
+• Do not restructure modules or routing.
+• Integrate the new functionality into the existing architecture with minimal disruption.
+
+• Begin implementing these changes throughout the LifeOSv4 codebase.
