@@ -713,11 +713,20 @@ const SettingsView: React.FC = () => {
     const saveMenuLayout = async (newLayout: any[]) => {
         const updatedSettings = { ...settings, menuLayout: newLayout };
         setSettings(updatedSettings);
-        if (settingsList.length > 0) {
-            await update(settingsList[0].id, updatedSettings);
-        } else {
-            await add(updatedSettings as any);
+        
+        try {
+            if (settingsList.length > 0 && settingsList[0].id && !settingsList[0].id.startsWith('temp-')) {
+                await update(settingsList[0].id, updatedSettings);
+            } else {
+                const { id, ...dataToSave } = updatedSettings;
+                await add(dataToSave as any);
+            }
+        } catch (err) {
+            console.error("Menu layout save failed, creating new settings:", err);
+            const { id, ...dataToSave } = updatedSettings;
+            await add(dataToSave as any);
         }
+        
         setOriginalSettings(JSON.parse(JSON.stringify(updatedSettings)));
     };
 
