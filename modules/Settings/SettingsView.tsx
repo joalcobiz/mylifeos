@@ -724,10 +724,9 @@ const SettingsView: React.FC = () => {
         
         const { id, ...dataToSave } = updatedSettings;
         
-        // Check if we have a valid Firestore document ID (not "global" or other default)
+        // Check if we have a valid Firestore document ID
         const hasValidFirestoreId = settingsList.length > 0 
             && settingsList[0].id 
-            && settingsList[0].id !== 'global'
             && !settingsList[0].id.startsWith('temp-');
         
         if (hasValidFirestoreId) {
