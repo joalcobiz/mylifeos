@@ -8,6 +8,7 @@ import {
   updateDoc, 
   deleteDoc, 
   doc,
+  setDoc,
   serverTimestamp
 } from 'firebase/firestore';
 import { db } from './firebase';
@@ -183,21 +184,20 @@ export function useFirestore<T extends { id: string }>(collectionName: string, i
       });
     } catch (err: any) {
       console.error("Error updating doc:", err);
-      // If document not found, create it instead
+      // If document not found, create it using setDoc at the same path
       if (err?.code === 'not-found') {
+        console.log("Document not found, creating with setDoc for collection:", collectionName, "id:", id);
         try {
-          const collectionRef = collection(db, 'users', user.uid, collectionName);
           const sanitizedUpdates = sanitizeForFirestore(updates);
-          const docRef = await addDoc(collectionRef, {
+          const docRef = doc(db, 'users', user.uid, collectionName, id);
+          await setDoc(docRef, {
             ...sanitizedUpdates,
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp()
           });
-          // Update local state with real ID
-          const finalData = newData.map(i => i.id === id ? { ...i, id: docRef.id } : i);
-          updateLocal(finalData);
-        } catch (addErr) {
-          console.error("Error creating doc after not-found:", addErr);
+          console.log("Successfully created doc with setDoc, ID:", id);
+        } catch (setErr) {
+          console.error("Error creating doc with setDoc:", setErr);
         }
       }
     }
