@@ -83,6 +83,25 @@ LIFEOS (Life Operating System) is a comprehensive personal life management appli
   - Tree view mockup with stacked cards and visual connectors
   - Person detail modal showing biography, life events, relationships
   - Cross-module references to Places, Documents, Photos, Calendar
+
+### Unified ModuleHeader System (December 2024)
+- Created reusable `ModuleHeader` component (`components/ModuleHeader.tsx`) with:
+  - Collapsible guide sections (like Family Tree and Settings>Sharing)
+  - Pastel gradient icon boxes (400-level colors for gentle appearance)
+  - Actions slot for module-specific buttons
+  - Consistent glassmorphism styling
+- Centralized module configuration (`config/moduleGuides.ts`) defining:
+  - 16 module keys with title, subtitle, icon, color, and guide sections
+  - `getModuleConfig()` and `getIcon()` helper functions
+  - Each module has unique gentle color theme
+- `ConfiguredModuleHeader` convenience wrapper that auto-loads config by moduleKey
+- Applied to all modules: Dashboard, Projects, Financial, Journal, Places, Habits, Goals, Groceries, Purchases, Documents, Loans, Templates, Calendar, Itineraries
+- Color palette uses softer 400-level gradients instead of saturated 500-600
+
+### Settings Singleton Pattern Fix (December 2024)
+- Fixed 166 duplicate settings documents issue
+- Settings now use fixed document ID `user-settings` with upsert pattern
+- Added `cleanupDuplicateSettings()` function for maintenance
 - Module placement: After Journal in sidebar navigation
 - Non-functional: Add/Edit buttons disabled pending backend implementation
 
