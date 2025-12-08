@@ -709,21 +709,30 @@ const SettingsView: React.FC = () => {
         }
     };
 
+    // Clear stale settings cache and force refresh
+    const repairSettingsCache = useCallback(() => {
+        if (!user) return;
+        const storageKey = `lifeos-${user.uid}-settings`;
+        localStorage.removeItem(storageKey);
+        window.location.reload();
+    }, [user]);
+
     // --- MENU EDITOR LOGIC ---
     const saveMenuLayout = async (newLayout: any[]) => {
         const updatedSettings = { ...settings, menuLayout: newLayout };
         setSettings(updatedSettings);
         
-        try {
-            if (settingsList.length > 0 && settingsList[0].id && !settingsList[0].id.startsWith('temp-')) {
-                await update(settingsList[0].id, updatedSettings);
-            } else {
-                const { id, ...dataToSave } = updatedSettings;
-                await add(dataToSave as any);
-            }
-        } catch (err) {
-            console.error("Menu layout save failed, creating new settings:", err);
-            const { id, ...dataToSave } = updatedSettings;
+        const { id, ...dataToSave } = updatedSettings;
+        
+        // Check if we have a valid Firestore document ID (not "global" or other default)
+        const hasValidFirestoreId = settingsList.length > 0 
+            && settingsList[0].id 
+            && settingsList[0].id !== 'global'
+            && !settingsList[0].id.startsWith('temp-');
+        
+        if (hasValidFirestoreId) {
+            await update(settingsList[0].id, updatedSettings);
+        } else {
             await add(dataToSave as any);
         }
         
@@ -1778,6 +1787,16 @@ const SettingsView: React.FC = () => {
                                         </button>
                                         <button onClick={addMenuDivider} className="text-sm bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg flex items-center gap-2 transition-colors font-medium text-gray-700">
                                             <Plus size={14} /> Add Divider
+                                        </button>
+                                        <button 
+                                            onClick={() => {
+                                                if (confirm('Clear cached settings and reload? This fixes save issues.')) {
+                                                    repairSettingsCache();
+                                                }
+                                            }} 
+                                            className="text-sm bg-red-100 hover:bg-red-200 text-red-700 px-3 py-2 rounded-lg flex items-center gap-2 transition-colors font-medium"
+                                        >
+                                            <RefreshCw size={14} /> Repair Cache
                                         </button>
                                     </div>
                                 </div>
