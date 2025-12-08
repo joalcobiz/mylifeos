@@ -39,6 +39,7 @@ const DEFAULT_SETTINGS: Settings = {
         { id: 'm15', type: 'view', view: 'calendar', isVisible: true },
         { id: 'm11', type: 'view', view: 'documents', isVisible: true },
         { id: 'm4', type: 'view', view: 'financial', isVisible: true },
+        { id: 'm16', type: 'view', view: 'genealogy', isVisible: true },
         { id: 'm13', type: 'view', view: 'goals', isVisible: true },
         { id: 'm10', type: 'view', view: 'groceries', isVisible: true },
         { id: 'm12', type: 'view', view: 'habits', isVisible: true },
@@ -1726,7 +1727,26 @@ const SettingsView: React.FC = () => {
                                         <h3 className="font-semibold text-gray-900">Sidebar Layout</h3>
                                         <p className="text-sm text-gray-500">Reorder modules, add dividers, or toggle visibility.</p>
                                     </div>
-                                    <div className="flex gap-2">
+                                    <div className="flex flex-wrap gap-2">
+                                        <button 
+                                            onClick={async () => {
+                                                const currentLayout = (settings.menuLayout || []).map(item => ({...item}));
+                                                const currentViews = new Set(currentLayout.filter(i => i.type === 'view').map(i => i.view));
+                                                const missingModules = DEFAULT_SETTINGS.menuLayout
+                                                    .filter(i => i.type === 'view' && !currentViews.has(i.view))
+                                                    .map(item => ({...item}));
+                                                if (missingModules.length === 0) {
+                                                    alert('All modules are already in your menu!');
+                                                    return;
+                                                }
+                                                const newLayout = [...currentLayout, ...missingModules];
+                                                await saveMenuLayout(newLayout);
+                                                alert(`Added ${missingModules.length} missing module(s): ${missingModules.map(m => m.view).join(', ')}`);
+                                            }} 
+                                            className="text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-2 rounded-lg flex items-center gap-2 transition-colors font-medium"
+                                        >
+                                            <Plus size={14} /> Add Missing
+                                        </button>
                                         <button 
                                             onClick={async () => {
                                                 const resetLayout = (settings.menuLayout || DEFAULT_SETTINGS.menuLayout).map(item => ({...item, isVisible: true}));
@@ -1735,6 +1755,17 @@ const SettingsView: React.FC = () => {
                                             className="text-sm bg-emerald-100 hover:bg-emerald-200 text-emerald-700 px-3 py-2 rounded-lg flex items-center gap-2 transition-colors font-medium"
                                         >
                                             <Eye size={14} /> Show All
+                                        </button>
+                                        <button 
+                                            onClick={async () => {
+                                                if (confirm('Reset menu to default layout? This will restore all modules in default order.')) {
+                                                    const newLayout = DEFAULT_SETTINGS.menuLayout.map(item => ({...item}));
+                                                    await saveMenuLayout(newLayout);
+                                                }
+                                            }} 
+                                            className="text-sm bg-amber-100 hover:bg-amber-200 text-amber-700 px-3 py-2 rounded-lg flex items-center gap-2 transition-colors font-medium"
+                                        >
+                                            <Undo2 size={14} /> Reset Default
                                         </button>
                                         <button onClick={addMenuDivider} className="text-sm bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg flex items-center gap-2 transition-colors font-medium text-gray-700">
                                             <Plus size={14} /> Add Divider
@@ -1755,7 +1786,7 @@ const SettingsView: React.FC = () => {
                                                     <div className="w-full h-px bg-gray-300 border-t border-dashed"></div>
                                                 ) : (
                                                     <div className="flex items-center gap-2 font-medium text-gray-700 capitalize">
-                                                        {item.view === 'purchases' ? 'Shopping' : item.view === 'templates' ? 'Collections' : item.view === 'loans' ? 'Money Flows' : item.view === 'itineraries' ? 'Itineraries' : item.view === 'places' ? 'Places & Events' : item.view}
+                                                        {item.view === 'purchases' ? 'Shopping' : item.view === 'templates' ? 'Collections' : item.view === 'loans' ? 'Money Flows' : item.view === 'itineraries' ? 'Itineraries' : item.view === 'places' ? 'Places & Events' : item.view === 'genealogy' ? 'Family Tree' : item.view}
                                                     </div>
                                                 )}
                                             </div>
