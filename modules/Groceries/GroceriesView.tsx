@@ -9,6 +9,7 @@ import UrgencySelector, { UrgencyBadge } from '../../components/UrgencySelector'
 import { useAuth, MOCK_USERS } from '../../contexts/AuthContext';
 import { useSharing, filterDataBySharing, SharingMode } from '../../contexts/SharingContext';
 import SharingFilter, { OwnerBadge } from '../../components/SharingFilter';
+import { ConfiguredModuleHeader } from '../../components/ModuleHeader';
 
 const LIST_COLORS = [
     { value: 'blue', bg: 'bg-blue-500', light: 'bg-blue-50', text: 'text-blue-600' },
@@ -374,52 +375,43 @@ const GroceriesView: React.FC = () => {
 
     return (
         <div className="space-y-6 animate-enter">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl p-4 text-white shadow-lg">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
-                        <ShoppingCart size={20} />
+            <ConfiguredModuleHeader 
+                moduleKey="groceries" 
+                actions={
+                    <div className="flex gap-2">
+                        <button 
+                            onClick={() => setViewMode('list')} 
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                                viewMode === 'list' 
+                                    ? 'bg-lime-600 text-white' 
+                                    : 'bg-lime-100 hover:bg-lime-200 text-lime-700'
+                            }`}
+                        >
+                            <ShoppingCart size={14} /> List
+                        </button>
+                        <button 
+                            onClick={() => setViewMode('frequent')} 
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                                viewMode === 'frequent' 
+                                    ? 'bg-lime-600 text-white' 
+                                    : 'bg-lime-100 hover:bg-lime-200 text-lime-700'
+                            }`}
+                        >
+                            <TrendingUp size={14} /> Frequent
+                        </button>
+                        <button 
+                            onClick={() => setViewMode('history')} 
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                                viewMode === 'history' 
+                                    ? 'bg-lime-600 text-white' 
+                                    : 'bg-lime-100 hover:bg-lime-200 text-lime-700'
+                            }`}
+                        >
+                            <History size={14} /> History
+                        </button>
                     </div>
-                    <div>
-                        <h2 className="text-lg font-bold">Groceries</h2>
-                        <p className="text-white/80 text-sm">
-                            {activeItems.length} items 
-                            {totalEstimate > 0 && <span className="ml-2">· Est. ${totalEstimate.toFixed(2)}</span>}
-                        </p>
-                    </div>
-                </div>
-                <div className="flex gap-2">
-                    <button 
-                        onClick={() => setViewMode('list')} 
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                            viewMode === 'list' 
-                                ? 'bg-white text-green-600' 
-                                : 'bg-white/20 hover:bg-white/30 text-white'
-                        }`}
-                    >
-                        <ShoppingCart size={14} /> List
-                    </button>
-                    <button 
-                        onClick={() => setViewMode('frequent')} 
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                            viewMode === 'frequent' 
-                                ? 'bg-white text-green-600' 
-                                : 'bg-white/20 hover:bg-white/30 text-white'
-                        }`}
-                    >
-                        <TrendingUp size={14} /> Frequent
-                    </button>
-                    <button 
-                        onClick={() => setViewMode('history')} 
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                            viewMode === 'history' 
-                                ? 'bg-white text-green-600' 
-                                : 'bg-white/20 hover:bg-white/30 text-white'
-                        }`}
-                    >
-                        <History size={14} /> History
-                    </button>
-                </div>
-            </div>
+                }
+            />
 
             <SharingFilter
                 mode={sharingMode}

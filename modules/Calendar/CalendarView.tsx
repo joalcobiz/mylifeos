@@ -8,6 +8,7 @@ import { CalendarEvent, View, ProjectItem, FinancialItem, JournalEntry, Habit, G
 import Modal from '../../components/Modal';
 import { useFirestore } from '../../services/firestore';
 import { Card, Button, Badge, Input, Select, Tabs, EmptyState } from '../../components/ui';
+import { ConfiguredModuleHeader } from '../../components/ModuleHeader';
 
 interface CalendarViewProps {
     onNavigate?: (view: View, params?: any) => void;
@@ -254,25 +255,18 @@ const CalendarView: React.FC<CalendarViewProps> = ({ onNavigate }) => {
 
     return (
         <div className="space-y-6 animate-enter">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl p-4 text-white shadow-lg">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
-                        <CalendarIcon size={20} />
-                    </div>
-                    <div>
-                        <h2 className="text-lg font-bold">Calendar</h2>
-                        <p className="text-white/80 text-sm">
-                            {allEvents.length} events from {enabledCount} sources
-                        </p>
-                    </div>
-                </div>
-                <button
-                    onClick={() => setCurrentDate(new Date())}
-                    className="px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition-colors"
-                >
-                    Today
-                </button>
-            </div>
+            <ConfiguredModuleHeader 
+                moduleKey="calendar" 
+                actions={
+                    <Button 
+                        onClick={() => setCurrentDate(new Date())}
+                        variant="secondary"
+                        size="sm"
+                    >
+                        Today
+                    </Button>
+                }
+            />
 
             {/* Event Type Toggle Cards */}
             <div className="grid grid-cols-4 sm:grid-cols-4 lg:grid-cols-8 gap-2">

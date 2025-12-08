@@ -5,10 +5,10 @@
 
 /* Default Variables - Will be overridden by React */
 :root {
-  --color-primary-main: #3b82f6;
-  --color-primary-hover: #2563eb;
-  --color-primary-light: #dbeafe;
-  --color-primary-muted: #eff6ff;
+  --color-primary-main: #1f2937;
+  --color-primary-hover: #111827;
+  --color-primary-light: #f3f4f6;
+  --color-primary-muted: #f9fafb;
 }
 
 /* Custom scrollbar for webkit */

@@ -10,6 +10,8 @@ import Modal from '../../components/Modal';
 import { useFirestore } from '../../services/firestore';
 import { uploadFile } from '../../services/storage';
 import { useAuth } from '../../contexts/AuthContext';
+import { ConfiguredModuleHeader } from '../../components/ModuleHeader';
+import { Button } from '../../components/ui';
 
 const DocumentsView: React.FC = () => {
     const { user } = useAuth();
@@ -151,31 +153,39 @@ const DocumentsView: React.FC = () => {
 
     return (
         <div className="space-y-6 h-[calc(100vh-140px)] flex flex-col">
-            {/* Header */}
-            <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex-shrink-0 animate-slide-down">
-                <div className="flex items-center gap-4 flex-1">
-                    <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                        <FileText className="w-5 h-5 text-primary" /> Documents
-                    </h2>
-                    
-                    <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100 text-sm overflow-hidden">
-                        {currentFolderId && (
-                            <button onClick={handleUp} className="hover:bg-gray-200 p-1 rounded text-gray-500">
-                                <ArrowUp size={14} />
+            <ConfiguredModuleHeader 
+                moduleKey="documents" 
+                actions={
+                    <Button 
+                        onClick={() => setIsUploadOpen(true)} 
+                        variant="primary"
+                        icon={Plus}
+                        size="sm"
+                    >
+                        Upload
+                    </Button>
+                } 
+            />
+
+            {/* Navigation Bar */}
+            <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex-shrink-0">
+                <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100 text-sm overflow-hidden">
+                    {currentFolderId && (
+                        <button onClick={handleUp} className="hover:bg-gray-200 p-1 rounded text-gray-500">
+                            <ArrowUp size={14} />
+                        </button>
+                    )}
+                    {getBreadcrumbs().map((crumb, idx, arr) => (
+                        <React.Fragment key={crumb.id}>
+                            <button 
+                                onClick={() => handleNavigate(crumb.id === 'root' ? undefined : crumb.id)}
+                                className={`hover:text-primary transition-colors whitespace-nowrap ${idx === arr.length - 1 ? 'font-semibold text-gray-900' : 'text-gray-500'}`}
+                            >
+                                {crumb.id === 'root' ? <Home size={14} /> : crumb.name}
                             </button>
-                        )}
-                        {getBreadcrumbs().map((crumb, idx, arr) => (
-                            <React.Fragment key={crumb.id}>
-                                <button 
-                                    onClick={() => handleNavigate(crumb.id === 'root' ? undefined : crumb.id)}
-                                    className={`hover:text-primary transition-colors whitespace-nowrap ${idx === arr.length - 1 ? 'font-semibold text-gray-900' : 'text-gray-500'}`}
-                                >
-                                    {crumb.id === 'root' ? <Home size={14} /> : crumb.name}
-                                </button>
-                                {idx < arr.length - 1 && <ChevronRight size={12} className="text-gray-300" />}
-                            </React.Fragment>
-                        ))}
-                    </div>
+                            {idx < arr.length - 1 && <ChevronRight size={12} className="text-gray-300" />}
+                        </React.Fragment>
+                    ))}
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -191,9 +201,6 @@ const DocumentsView: React.FC = () => {
                     </div>
                     <button onClick={() => setIsFolderModalOpen(true)} className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors" title="New Folder">
                         <FolderIcon size={20} />
-                    </button>
-                    <button onClick={() => setIsUploadOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-hover shadow-sm transition-colors">
-                        <Plus className="w-4 h-4" /> Upload
                     </button>
                 </div>
             </div>

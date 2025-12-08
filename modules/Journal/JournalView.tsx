@@ -4,6 +4,7 @@ import {
     Meh, Sun, Cloud, Zap, Coffee, Trash2, Edit2, ChevronRight, Sparkles,
     Image, Paperclip, X, Upload, File, LayoutGrid, List
 } from 'lucide-react';
+import { ConfiguredModuleHeader } from '../../components/ModuleHeader';
 import { JournalEntry, Place } from '../../types';
 import Modal from '../../components/Modal';
 import ConfirmDialog from '../../components/ConfirmDialog';
@@ -283,25 +284,19 @@ const JournalView: React.FC<JournalViewProps> = ({ focusId }) => {
 
     return (
         <div className="space-y-6 animate-enter">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-gradient-to-r from-pink-500 to-rose-500 rounded-xl p-4 text-white shadow-lg">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
-                        <BookOpen size={20} />
-                    </div>
-                    <div>
-                        <h2 className="text-lg font-bold">Journal</h2>
-                        <p className="text-white/80 text-sm">Capture your thoughts and feelings</p>
-                    </div>
-                </div>
-                <Button 
-                    onClick={handleOpenCreate} 
-                    variant="secondary"
-                    icon={Plus}
-                    size="sm"
-                >
-                    New Entry
-                </Button>
-            </div>
+            <ConfiguredModuleHeader 
+                moduleKey="journal" 
+                actions={
+                    <Button 
+                        onClick={handleOpenCreate} 
+                        variant="secondary"
+                        icon={Plus}
+                        size="sm"
+                    >
+                        New Entry
+                    </Button>
+                }
+            />
 
             <SharingFilter
                 mode={sharingMode}

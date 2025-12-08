@@ -12,6 +12,7 @@ import Modal from '../../components/Modal';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import { useFirestore } from '../../services/firestore';
 import { Card, Button, Badge, Input, EmptyState, Tabs } from '../../components/ui';
+import { ConfiguredModuleHeader } from '../../components/ModuleHeader';
 
 interface CollectionDef {
     name: string;
@@ -226,40 +227,20 @@ const TemplatesView: React.FC = () => {
 
     return (
         <div className="space-y-4 animate-enter">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-gradient-to-r from-violet-500 to-purple-500 rounded-xl p-4 text-white shadow-lg">
-                <div className="flex items-center gap-3">
-                    {mobileView === 'detail' && activeCollection && (
-                        <button onClick={() => setMobileView('list')} className="md:hidden p-2 -ml-2 hover:bg-white/20 rounded-lg">
-                            <ChevronLeft size={20} />
-                        </button>
-                    )}
-                    <div className="w-10 h-10 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
-                        <Grid size={20} />
-                    </div>
-                    <div>
-                        <h2 className="text-lg font-bold">
-                            {mobileView === 'detail' && activeCollection ? activeCollection.name : 'Collections'}
-                        </h2>
-                        <p className="text-white/80 text-sm">
-                            {mobileView === 'detail' && activeCollection 
-                                ? `${activeCollection.items.length} items`
-                                : `${userCollections.length} collections`
-                            }
-                        </p>
-                    </div>
-                </div>
-                <div className="flex gap-2">
-                    {mobileView === 'detail' && activeCollection ? (
-                        <Button onClick={() => { setActiveItemData({ id: '' }); setIsAddItemOpen(true); }} variant="glass" icon={Plus}>
+            <ConfiguredModuleHeader 
+                moduleKey="templates" 
+                actions={
+                    mobileView === 'detail' && activeCollection ? (
+                        <Button onClick={() => { setActiveItemData({ id: '' }); setIsAddItemOpen(true); }} variant="primary" icon={Plus} size="sm">
                             Add Item
                         </Button>
                     ) : (
-                        <Button onClick={() => setIsLibraryOpen(true)} variant="glass" icon={Plus}>
+                        <Button onClick={() => setIsLibraryOpen(true)} variant="primary" icon={Plus} size="sm">
                             New Collection
                         </Button>
-                    )}
-                </div>
-            </div>
+                    )
+                } 
+            />
 
             <div className={`${mobileView === 'detail' ? 'hidden md:block' : 'block'}`}>
                 <Card padding="sm" className="mb-4">

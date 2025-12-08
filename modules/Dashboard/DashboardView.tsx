@@ -13,6 +13,7 @@ import HighlightText from '../../components/HighlightText';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSharing, filterDataBySharing, SharingMode } from '../../contexts/SharingContext';
 import { TaskStream, StreamItem } from '../../components/TaskStream';
+import { ConfiguredModuleHeader } from '../../components/ModuleHeader';
 
 const DEFAULT_WIDGETS: DashboardWidget[] = [
     { id: 'w1', type: 'quickCapture', isVisible: true, order: 0 },
@@ -685,55 +686,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch }) => {
 
     return (
         <div className="space-y-6 animate-enter">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h2 className="text-2xl font-bold text-gray-900">
-                        Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, {user?.displayName?.split(' ')[0] || 'there'}
-                    </h2>
-                    <p className="text-gray-500 mt-1">Here's what's happening in your life today</p>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                    {isEditMode ? (
-                        <div className="flex items-center gap-2">
-                            <Button variant="ghost" size="sm" onClick={cancelEdit}>Cancel</Button>
-                            <Button variant="primary" size="sm" onClick={saveLayout}>Save Layout</Button>
-                        </div>
-                    ) : (
-                        <button
-                            onClick={() => setIsEditMode(true)}
-                            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                            title="Customize dashboard"
-                        >
-                            <Settings size={18} />
-                        </button>
-                    )}
-                    <div className="relative">
-                        <Input
-                            icon={Search}
-                            placeholder="Search everything..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full md:w-72"
-                        />
-                        {searchResults.length > 0 && (
-                            <div className="absolute top-full mt-2 w-full bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-20 max-h-80 overflow-y-auto">
-                                {searchResults.map(result => (
-                                    <button key={result.id} className="w-full px-4 py-2.5 text-left hover:bg-gray-50 flex items-center gap-3 transition-colors">
-                                        <div className="w-8 h-8 rounded-lg bg-primary-muted flex items-center justify-center">
-                                            <Search size={14} className="text-primary" />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-medium text-gray-900 truncate">{result.title}</p>
-                                            <p className="text-xs text-gray-500">{result.type} • {result.subtitle}</p>
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
+            <ConfiguredModuleHeader moduleKey="dashboard" />
             
             {isEditMode && (
                 <Card variant="glass" className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">

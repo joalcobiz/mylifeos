@@ -8,6 +8,7 @@ import Modal from '../../components/Modal';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import { useFirestore } from '../../services/firestore';
 import { Card, Button, Badge, Input, Select, Tabs, EmptyState, StatCard } from '../../components/ui';
+import { ConfiguredModuleHeader } from '../../components/ModuleHeader';
 import HighlightText from '../../components/HighlightText';
 import { researchItem } from '../../services/gemini';
 import UrgencySelector, { UrgencyBadge } from '../../components/UrgencySelector';
@@ -248,25 +249,19 @@ const PurchasesView: React.FC = () => {
 
     return (
         <div className="space-y-6 animate-enter">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-xl p-4 text-white shadow-lg">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
-                        <ShoppingBag size={20} />
-                    </div>
-                    <div>
-                        <h2 className="text-lg font-bold">Shopping List</h2>
-                        <p className="text-white/80 text-sm">Track items you want to buy</p>
-                    </div>
-                </div>
-                <Button 
-                    onClick={handleOpenAdd} 
-                    variant="secondary"
-                    icon={Plus}
-                    size="sm"
-                >
-                    Add Item
-                </Button>
-            </div>
+            <ConfiguredModuleHeader 
+                moduleKey="purchases" 
+                actions={
+                    <Button 
+                        onClick={handleOpenAdd} 
+                        variant="primary"
+                        icon={Plus}
+                        size="sm"
+                    >
+                        Add Item
+                    </Button>
+                } 
+            />
 
             <SharingFilter
                 mode={sharingMode}

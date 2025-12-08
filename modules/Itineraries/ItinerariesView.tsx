@@ -19,6 +19,7 @@ import { useSharing, filterDataBySharing, SharingMode } from '../../contexts/Sha
 import SharingFilter, { OwnerBadge } from '../../components/SharingFilter';
 import { generateItineraryPDF } from '../../utils/pdfItinerary';
 import { uploadPhoto } from '../../services/storage';
+import { ConfiguredModuleHeader } from '../../components/ModuleHeader';
 
 interface GooglePrediction {
     place_id: string;
@@ -1015,35 +1016,28 @@ const ItinerariesView: React.FC = () => {
 
     return (
         <div className="space-y-6 animate-enter">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl p-5 text-white shadow-xl">
-                <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center shadow-lg">
-                        <Plane size={28} />
-                    </div>
-                    <div>
-                        <h2 className="text-2xl font-bold">Itinerary Planner</h2>
-                        <p className="text-white/80 text-sm">Plan and organize your adventures</p>
-                    </div>
-                </div>
-                <Button 
-                    onClick={() => {
-                        setEditingItinerary(null);
-                        setFormData({ name: '', start: '', end: '', notes: '', theme: 'default' });
-                        setStops([]);
-                        setLocationSearch('');
-                        setLocationPredictions([]);
-                        setShowLocationPredictions(false);
-                        setCollapsedDays(new Set());
-                        setIsModalOpen(true);
-                    }} 
-                    variant="secondary"
-                    icon={Plus}
-                    size="md"
-                    className="shadow-lg"
-                >
-                    New Itinerary
-                </Button>
-            </div>
+            <ConfiguredModuleHeader 
+                moduleKey="itineraries" 
+                actions={
+                    <Button 
+                        onClick={() => {
+                            setEditingItinerary(null);
+                            setFormData({ name: '', start: '', end: '', notes: '', theme: 'default' });
+                            setStops([]);
+                            setLocationSearch('');
+                            setLocationPredictions([]);
+                            setShowLocationPredictions(false);
+                            setCollapsedDays(new Set());
+                            setIsModalOpen(true);
+                        }} 
+                        variant="primary"
+                        icon={Plus}
+                        size="md"
+                    >
+                        New Trip
+                    </Button>
+                }
+            />
 
             <SharingFilter
                 mode={sharingMode}

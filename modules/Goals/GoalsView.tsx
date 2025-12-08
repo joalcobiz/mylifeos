@@ -8,6 +8,7 @@ import { Card, Button, Badge, Progress, Input, Textarea, EmptyState } from '../.
 import { useAuth } from '../../contexts/AuthContext';
 import { useSharing, filterDataBySharing, SharingMode } from '../../contexts/SharingContext';
 import SharingFilter, { OwnerBadge } from '../../components/SharingFilter';
+import { ConfiguredModuleHeader } from '../../components/ModuleHeader';
 
 const GoalsView: React.FC = () => {
     const { user } = useAuth();
@@ -146,40 +147,34 @@ const GoalsView: React.FC = () => {
 
     return (
         <div className="space-y-6 animate-enter">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl p-4 text-white shadow-lg">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
-                        <Target size={20} />
+            <ConfiguredModuleHeader 
+                moduleKey="goals" 
+                actions={
+                    <div className="flex items-center gap-2">
+                        <label className="flex items-center gap-2 text-xs bg-indigo-100 text-indigo-700 px-2.5 py-1.5 rounded-lg cursor-pointer">
+                            <input 
+                                type="checkbox" 
+                                checked={autoUpdateProgress} 
+                                onChange={e => setAutoUpdateProgress(e.target.checked)} 
+                                className="rounded text-indigo-600 focus:ring-indigo-500 w-3.5 h-3.5"
+                            />
+                            <span>Auto-sync</span>
+                        </label>
+                        <Button 
+                            onClick={() => {
+                                setEditingGoal(null);
+                                setNewGoal({ name: '', description: '', status: 'Not Started', progress: 0, deadline: '', linkedProjectIds: [] });
+                                setIsModalOpen(true);
+                            }} 
+                            variant="primary"
+                            icon={Plus}
+                            size="sm"
+                        >
+                            New Goal
+                        </Button>
                     </div>
-                    <div>
-                        <h2 className="text-lg font-bold">Goals</h2>
-                        <p className="text-white/80 text-sm">Long-term objectives linked to projects</p>
-                    </div>
-                </div>
-                <div className="flex items-center gap-2">
-                    <label className="flex items-center gap-2 text-xs bg-white/10 backdrop-blur px-2.5 py-1.5 rounded-lg cursor-pointer">
-                        <input 
-                            type="checkbox" 
-                            checked={autoUpdateProgress} 
-                            onChange={e => setAutoUpdateProgress(e.target.checked)} 
-                            className="rounded text-white focus:ring-white/50 w-3.5 h-3.5"
-                        />
-                        <span>Auto-sync</span>
-                    </label>
-                    <Button 
-                        onClick={() => {
-                            setEditingGoal(null);
-                            setNewGoal({ name: '', description: '', status: 'Not Started', progress: 0, deadline: '', linkedProjectIds: [] });
-                            setIsModalOpen(true);
-                        }} 
-                        variant="secondary"
-                        icon={Plus}
-                        size="sm"
-                    >
-                        New Goal
-                    </Button>
-                </div>
-            </div>
+                }
+            />
 
             <SharingFilter
                 mode={sharingMode}

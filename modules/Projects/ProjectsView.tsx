@@ -3,8 +3,10 @@ import {
     Plus, ChevronRight, ChevronDown, Edit2, CheckSquare, Square, MessageSquare,
     User, Search, Trash2, Send, Paperclip, MoreHorizontal, StickyNote, FilePlus,
     FolderKanban, Calendar, Flag, Clock, Users, Target, ArrowRight, Inbox, 
-    LayoutList, Table2, UserCheck, Filter, Bell, BellRing, AlertCircle, X
+    LayoutList, Table2, UserCheck, Filter, Bell, BellRing, AlertCircle, X,
+    Lightbulb, BookOpen, GitBranch
 } from 'lucide-react';
+import { ConfiguredModuleHeader } from '../../components/ModuleHeader';
 import { ProjectItem, SortConfig, StatusLevel, PriorityLevel, Note, Goal, Reminder } from '../../types';
 import Modal from '../../components/Modal';
 import ConfirmDialog from '../../components/ConfirmDialog';
@@ -767,25 +769,19 @@ const ProjectsView: React.FC<ProjectsViewProps> = ({ focusId }) => {
 
     return (
         <div className="space-y-6 animate-enter">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl p-4 text-white shadow-lg">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
-                        <FolderKanban size={20} />
-                    </div>
-                    <div>
-                        <h2 className="text-lg font-bold">Projects</h2>
-                        <p className="text-white/80 text-sm">Manage your projects and tasks</p>
-                    </div>
-                </div>
-                <Button 
-                    onClick={() => handleOpenCreate()} 
-                    variant="secondary"
-                    icon={Plus}
-                    size="sm"
-                >
-                    New Project
-                </Button>
-            </div>
+            <ConfiguredModuleHeader 
+                moduleKey="projects" 
+                actions={
+                    <Button 
+                        onClick={() => handleOpenCreate()} 
+                        variant="secondary"
+                        icon={Plus}
+                        size="sm"
+                    >
+                        New Project
+                    </Button>
+                }
+            />
 
             {/* Quick Notes Section - Always at Top */}
             <Card className="border-2 border-amber-200 bg-amber-50/30">

@@ -9,6 +9,8 @@ import { useFirestore } from '../../services/firestore';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSharing, filterDataBySharing, SharingMode } from '../../contexts/SharingContext';
 import SharingFilter, { OwnerBadge } from '../../components/SharingFilter';
+import { ConfiguredModuleHeader } from '../../components/ModuleHeader';
+import { Button } from '../../components/ui';
 
 interface NearbyPlace {
   placeId: string;
@@ -1021,82 +1023,77 @@ const PlacesView: React.FC = () => {
                 </div>
             )}
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm animate-slide-down">
-                <div className="flex items-center gap-4">
-                     <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2"><MapPin className="w-5 h-5 text-primary" /> Places & Events</h2>
-                     <span className="text-sm text-gray-500">{filteredPlaces.length} places</span>
-                </div>
-                
-                <div className="flex items-center gap-3 flex-wrap">
-                    {/* Selection Mode Toggle */}
-                    <button 
-                        onClick={() => {
-                            if (isSelectionMode) {
-                                clearSelection();
-                            } else {
-                                setIsSelectionMode(true);
-                            }
-                        }}
-                        className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                            isSelectionMode 
-                                ? 'bg-primary/10 text-primary border border-primary' 
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-transparent'
-                        }`}
-                    >
-                        <CheckSquare className="w-4 h-4" />
-                        {isSelectionMode ? 'Cancel' : 'Select'}
-                    </button>
-
-                    {isSelectionMode && (
+            <ConfiguredModuleHeader 
+                moduleKey="places" 
+                actions={
+                    <div className="flex items-center gap-3 flex-wrap">
                         <button 
-                            onClick={selectAllPlaces}
-                            className="text-xs text-primary hover:underline"
+                            onClick={() => {
+                                if (isSelectionMode) {
+                                    clearSelection();
+                                } else {
+                                    setIsSelectionMode(true);
+                                }
+                            }}
+                            className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                isSelectionMode 
+                                    ? 'bg-rose-100 text-rose-700 border border-rose-300' 
+                                    : 'bg-rose-50 text-rose-600 hover:bg-rose-100 border border-transparent'
+                            }`}
                         >
-                            Select All ({filteredPlaces.length})
+                            <CheckSquare className="w-4 h-4" />
+                            {isSelectionMode ? 'Cancel' : 'Select'}
                         </button>
-                    )}
 
-                    {/* View Mode Toggle */}
-                    <div className="flex items-center bg-gray-100 p-0.5 rounded-lg">
-                        <button
-                            onClick={() => setViewMode('list')}
-                            className={`p-2 rounded-md transition-colors ${viewMode === 'list' ? 'bg-white shadow-sm text-primary' : 'text-gray-500 hover:text-gray-700'}`}
-                            title="List View"
-                        >
-                            <List className="w-4 h-4" />
-                        </button>
-                        <button
-                            onClick={() => setViewMode('table')}
-                            className={`p-2 rounded-md transition-colors ${viewMode === 'table' ? 'bg-white shadow-sm text-primary' : 'text-gray-500 hover:text-gray-700'}`}
-                            title="Table View"
-                        >
-                            <Layers className="w-4 h-4" />
-                        </button>
-                    </div>
+                        {isSelectionMode && (
+                            <button 
+                                onClick={selectAllPlaces}
+                                className="text-xs text-rose-600 hover:underline"
+                            >
+                                Select All ({filteredPlaces.length})
+                            </button>
+                        )}
 
-                    {/* Group By Selector */}
-                    <div className="flex items-center gap-2 bg-gray-50 p-1 rounded-lg border border-gray-200">
-                        <Layers className="w-4 h-4 text-gray-400 ml-2" />
-                        <select 
-                            value={groupBy} 
-                            onChange={(e) => setGroupBy(e.target.value as 'none' | 'type' | 'city' | 'drafts')}
-                            className="bg-transparent text-sm text-gray-700 border-none focus:ring-0 cursor-pointer pr-6"
-                        >
-                            <option value="none">No Grouping</option>
-                            <option value="type">Group by Type</option>
-                            <option value="city">Group by City</option>
-                            <option value="drafts">Group by Status</option>
-                        </select>
+                        <div className="flex items-center bg-rose-50 p-0.5 rounded-lg">
+                            <button
+                                onClick={() => setViewMode('list')}
+                                className={`p-2 rounded-md transition-colors ${viewMode === 'list' ? 'bg-white shadow-sm text-rose-600' : 'text-rose-400 hover:text-rose-600'}`}
+                                title="List View"
+                            >
+                                <List className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={() => setViewMode('table')}
+                                className={`p-2 rounded-md transition-colors ${viewMode === 'table' ? 'bg-white shadow-sm text-rose-600' : 'text-rose-400 hover:text-rose-600'}`}
+                                title="Table View"
+                            >
+                                <Layers className="w-4 h-4" />
+                            </button>
+                        </div>
+
+                        <div className="flex items-center gap-2 bg-rose-50 p-1 rounded-lg border border-rose-100">
+                            <Layers className="w-4 h-4 text-rose-400 ml-2" />
+                            <select 
+                                value={groupBy} 
+                                onChange={(e) => setGroupBy(e.target.value as 'none' | 'type' | 'city' | 'drafts')}
+                                className="bg-transparent text-sm text-rose-700 border-none focus:ring-0 cursor-pointer pr-6"
+                            >
+                                <option value="none">No Grouping</option>
+                                <option value="type">Group by Type</option>
+                                <option value="city">Group by City</option>
+                                <option value="drafts">Group by Status</option>
+                            </select>
+                        </div>
+                        
+                        <Button onClick={handleOpenDiscoverNearby} variant="secondary" icon={Compass} size="sm">
+                            Discover Nearby
+                        </Button>
+                        <Button onClick={() => { setSelectedPlace(null); setIsFormOpen(true); }} variant="primary" icon={Plus} size="sm">
+                            Add Place
+                        </Button>
                     </div>
-                    
-                    <button onClick={handleOpenDiscoverNearby} className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 shadow-sm">
-                        <Compass className="w-4 h-4" /> Discover Nearby
-                    </button>
-                    <button onClick={() => { setSelectedPlace(null); setIsFormOpen(true); }} className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-hover shadow-sm">
-                        <Plus className="w-4 h-4" /> Add Place
-                    </button>
-                </div>
-            </div>
+                }
+            />
 
             <SharingFilter
                 mode={sharingMode}

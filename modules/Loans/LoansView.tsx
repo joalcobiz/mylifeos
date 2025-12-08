@@ -9,6 +9,7 @@ import { Loan, LoanCategory, LoanTransaction } from '../../types';
 import Modal from '../../components/Modal';
 import { useFirestore } from '../../services/firestore';
 import { Card, Button, Badge, Input, Select, Tabs, EmptyState, StatCard, Progress } from '../../components/ui';
+import { ConfiguredModuleHeader } from '../../components/ModuleHeader';
 import HighlightText from '../../components/HighlightText';
 
 const LoansView: React.FC = () => {
@@ -144,25 +145,19 @@ const LoansView: React.FC = () => {
 
     return (
         <div className="space-y-6 animate-enter">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-gradient-to-r from-violet-500 to-purple-500 rounded-xl p-4 text-white shadow-lg">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
-                        <ArrowRightLeft size={20} />
-                    </div>
-                    <div>
-                        <h2 className="text-lg font-bold">Money Flows</h2>
-                        <p className="text-white/80 text-sm">Track liabilities, assets, and debts</p>
-                    </div>
-                </div>
-                <Button 
-                    onClick={handleOpenAdd} 
-                    variant="secondary"
-                    icon={Plus}
-                    size="sm"
-                >
-                    New Entry
-                </Button>
-            </div>
+            <ConfiguredModuleHeader 
+                moduleKey="loans" 
+                actions={
+                    <Button 
+                        onClick={handleOpenAdd} 
+                        variant="primary"
+                        icon={Plus}
+                        size="sm"
+                    >
+                        New Entry
+                    </Button>
+                } 
+            />
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <StatCard

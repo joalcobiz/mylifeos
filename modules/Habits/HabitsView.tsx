@@ -8,6 +8,7 @@ import { Card, Button, Badge, Progress, Input, EmptyState } from '../../componen
 import { useAuth } from '../../contexts/AuthContext';
 import { useSharing, filterDataBySharing, SharingMode } from '../../contexts/SharingContext';
 import SharingFilter, { OwnerBadge } from '../../components/SharingFilter';
+import { ConfiguredModuleHeader } from '../../components/ModuleHeader';
 
 const HabitsView: React.FC = () => {
     const { user } = useAuth();
@@ -156,28 +157,22 @@ const HabitsView: React.FC = () => {
 
     return (
         <div className="space-y-6 animate-enter">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl p-4 text-white shadow-lg">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
-                        <Flame size={20} />
-                    </div>
-                    <div>
-                        <h2 className="text-lg font-bold">Habits</h2>
-                        <p className="text-white/80 text-sm">Build consistency, one day at a time</p>
-                    </div>
-                </div>
-                <Button 
-                    onClick={() => {
-                        setEditingHabit(null);
-                        setNewHabit({ name: '', description: '', frequency: 'Daily', streak: 0, history: [] });
-                        setIsModalOpen(true);
-                    }} 
-                    variant="secondary"
-                    icon={Plus}
-                >
-                    New Habit
-                </Button>
-            </div>
+            <ConfiguredModuleHeader 
+                moduleKey="habits" 
+                actions={
+                    <Button 
+                        onClick={() => {
+                            setEditingHabit(null);
+                            setNewHabit({ name: '', description: '', frequency: 'Daily', streak: 0, history: [] });
+                            setIsModalOpen(true);
+                        }} 
+                        variant="secondary"
+                        icon={Plus}
+                    >
+                        New Habit
+                    </Button>
+                }
+            />
 
             <SharingFilter
                 mode={sharingMode}

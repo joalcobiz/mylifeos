@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, Info, LucideIcon } from 'lucide-react';
+import { ModuleKey, getModuleConfig, getIcon, ModuleGuideSection as ConfigGuideSection } from '../config/moduleGuides';
 
 export interface ModuleGuideSection {
     icon: LucideIcon;
@@ -263,7 +264,20 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
                                         {section.title}
                                     </h3>
                                     <div className="text-gray-600 text-sm leading-relaxed">
-                                        {section.content}
+                                        {typeof section.content === 'string' ? (
+                                            <p>{section.content}</p>
+                                        ) : Array.isArray(section.content) ? (
+                                            <ul className="space-y-1">
+                                                {(section.content as string[]).map((item, i) => (
+                                                    <li key={i} className="flex items-start gap-2">
+                                                        <span className={colors.bullet}>•</span>
+                                                        <span>{item}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        ) : (
+                                            section.content
+                                        )}
                                     </div>
                                 </div>
                             );
@@ -276,3 +290,36 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
 };
 
 export default ModuleHeader;
+
+interface ConfiguredModuleHeaderProps {
+    moduleKey: ModuleKey;
+    actions?: React.ReactNode;
+    defaultGuideExpanded?: boolean;
+}
+
+export const ConfiguredModuleHeader: React.FC<ConfiguredModuleHeaderProps> = ({
+    moduleKey,
+    actions,
+    defaultGuideExpanded = false,
+}) => {
+    const config = getModuleConfig(moduleKey);
+    const Icon = getIcon(config.iconName);
+    
+    const guideSections: ModuleGuideSection[] = config.guideSections.map(section => ({
+        icon: getIcon(section.iconName),
+        title: section.title,
+        content: section.content
+    }));
+
+    return (
+        <ModuleHeader
+            title={config.title}
+            subtitle={config.subtitle}
+            icon={Icon}
+            color={config.color}
+            guideSections={guideSections}
+            actions={actions}
+            defaultGuideExpanded={defaultGuideExpanded}
+        />
+    );
+};

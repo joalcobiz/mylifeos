@@ -4,6 +4,7 @@ import {
     DollarSign, CreditCard, Calendar, ArrowUpRight, ArrowDownRight, PieChart,
     User, RefreshCw, LayoutGrid, List, Clock, FileText, History, ChevronDown, ChevronUp
 } from 'lucide-react';
+import { ConfiguredModuleHeader } from '../../components/ModuleHeader';
 import { FinancialItem, TransactionType, CurrencyCode, Settings, BalanceHistoryEntry } from '../../types';
 import Modal from '../../components/Modal';
 import { useFirestore } from '../../services/firestore';
@@ -162,25 +163,19 @@ const FinancialView: React.FC = () => {
 
     return (
         <div className="space-y-6 animate-enter">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl p-4 text-white shadow-lg">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
-                        <Wallet size={20} />
-                    </div>
-                    <div>
-                        <h2 className="text-lg font-bold">Financial</h2>
-                        <p className="text-white/80 text-sm">Track your income and expenses</p>
-                    </div>
-                </div>
-                <Button 
-                    onClick={handleOpenAdd} 
-                    variant="secondary"
-                    icon={Plus}
-                    size="sm"
-                >
-                    Add {activeTab === 'income' ? 'Income' : 'Expense'}
-                </Button>
-            </div>
+            <ConfiguredModuleHeader 
+                moduleKey="financial" 
+                actions={
+                    <Button 
+                        onClick={handleOpenAdd} 
+                        variant="secondary"
+                        icon={Plus}
+                        size="sm"
+                    >
+                        Add {activeTab === 'income' ? 'Income' : 'Expense'}
+                    </Button>
+                }
+            />
 
             <SharingFilter
                 mode={sharingMode}
