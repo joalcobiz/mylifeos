@@ -1,0 +1,278 @@
+PHASE 7-A: Genealogy Data Model + CRUD (Weeks 23-24)
+
+**Goal:** Create Genealogy module foundation.
+
+**AI DIRECTIVE:**
+```
+Create Genealogy module with basic CRUD.
+Do NOT implement tree visualization yet.
+Do NOT implement approval workflow yet.
+Focus on data model and list view.
+```
+
+#### Data Model
+
+```typescript
+// types/genealogy.ts
+
+interface FamilyMember extends BaseEntity {
+  // Identity
+  firstName: string;
+  middleName?: string;
+  lastName: string;
+  maidenName?: string;
+  suffix?: string;
+  nicknames?: string[];
+  gender?: 'male' | 'female' | 'other';
+  
+  // Dates & Places
+  birthDate?: string;
+  birthDateApproximate?: boolean;
+  birthPlace?: string;
+  birthPlaceId?: string;  // Link to Places
+  
+  deathDate?: string;
+  deathPlace?: string;
+  burialLocation?: string;
+  
+  isLiving: boolean;
+  
+  // Media
+  profilePhotoUrl?: string;
+  photos?: FamilyPhoto[];
+  documents?: FamilyDocument[];
+  
+  // Story
+  biography?: string;
+  lifeEvents?: LifeEvent[];
+  memories?: Memory[];
+  quotes?: string[];
+  
+  // Relationships
+  fatherId?: string;
+  motherId?: string;
+  spouses?: SpouseRelation[];
+  childrenIds?: string[];
+  
+  // Approval (for Phase 7-C)
+  status: 'approved' | 'pending' | 'rejected';
+  submittedBy?: string;
+  approvedBy?: string;
+  rejectionReason?: string;
+}
+
+interface SpouseRelation {
+  spouseId: string;
+  marriageDate?: string;
+  marriagePlace?: string;
+  divorceDate?: string;
+  order: number;  // 1st, 2nd marriage etc.
+  relationshipType: 'married' | 'partner' | 'divorced' | 'widowed';
+}
+
+interface LifeEvent {
+  id: string;
+  type: 'birth' | 'education' | 'career' | 'military' | 'marriage' | 
+        'divorce' | 'residence' | 'immigration' | 'religious' | 
+        'achievement' | 'death' | 'custom';
+  title: string;
+  date?: string;
+  endDate?: string;
+  location?: string;
+  description?: string;
+}
+
+interface Memory {
+  id: string;
+  content: string;
+  contributedBy: string;
+  contributedByName: string;
+  createdAt: string;
+  type: 'story' | 'quote' | 'recipe' | 'tradition';
+}
+
+interface FamilyPhoto {
+  id: string;
+  url: string;
+  caption?: string;
+  date?: string;
+  category: 'childhood' | 'wedding' | 'family' | 'military' | 'career' | 'other';
+  people?: string[];  // IDs of family members in photo
+  uploadedBy: string;
+  createdAt: string;
+  isPrivate?: boolean;
+}
+```
+
+#### Basic Views (Phase 7-A)
+
+1. **List View:** Searchable, sortable table
+2. **Person Detail:** View all info for one person
+3. **Add/Edit Form:** Multi-step form
+
+#### Firestore Structure
+
+```
+groups/{groupId}/genealogy/{personId}
+groups/{groupId}/genealogyPhotos/{photoId}
+groups/{groupId}/genealogyMemories/{memoryId}
+```
+
+#### Deliverables
+- [ ] FamilyMember type complete
+- [ ] List view with search/sort
+- [ ] Add person form
+- [ ] Edit person form
+- [ ] Photo upload
+- [ ] Life events timeline (simple list)
+
+---
+
+### PHASE 7-B: Genealogy Views (Weeks 25-26)
+
+**Goal:** Implement tree and map visualizations.
+
+**AI DIRECTIVE:**
+```
+Create TreeView and MapView components.
+Use existing data from Phase 7-A.
+```
+
+#### Tree View
+
+```tsx
+// modules/Genealogy/views/TreeView.tsx
+
+// Options:
+// 1. react-family-tree (if works well)
+// 2. D3.js custom implementation
+// 3. Custom CSS Grid layout
+
+interface TreeViewProps {
+  rootPersonId: string;
+  direction: 'ancestors' | 'descendants' | 'both';
+  maxGenerations: number;
+}
+
+// Features:
+// - Click person to view/edit
+// - Expand/collapse branches
+// - Add child/parent/spouse from tree
+// - Minimap for large trees
+```
+
+#### Map View
+
+```tsx
+// modules/Genealogy/views/MapView.tsx
+
+// Using react-leaflet or Google Maps
+
+interface MapMarker {
+  personId: string;
+  personName: string;
+  type: 'birth' | 'death' | 'residence' | 'burial';
+  location: { lat: number; lng: number };
+  date?: string;
+}
+
+// Features:
+// - Cluster nearby markers
+// - Filter by event type
+// - Click marker to view person
+// - Draw migration lines (optional)
+```
+
+#### Timeline View
+
+```tsx
+// modules/Genealogy/views/TimelineView.tsx
+
+// Vertical timeline of all events across family
+
+interface TimelineEvent {
+  date: string;
+  personId: string;
+  personName: string;
+  eventType: string;
+  description: string;
+}
+
+// Features:
+// - Filter by person/event type
+// - Scroll through decades
+// - Click to view person
+```
+
+#### Deliverables
+- [ ] TreeView with expand/collapse
+- [ ] MapView with markers
+- [ ] TimelineView (basic)
+- [ ] View switcher in module header
+
+---
+
+### PHASE 7-C: Genealogy Approval & Privacy (Week 27)
+
+**Goal:** Implement contributor approval workflow and privacy controls.
+
+**AI DIRECTIVE:**
+```
+Add approval workflow. Implement privacy controls.
+Only Admins can see pending items.
+```
+
+#### Access Control
+
+```typescript
+type GenealogyRole = 'admin' | 'contributor' | 'viewer' | 'none';
+
+// Stored in group document:
+interface Group {
+  // ...
+  genealogyAccess: Record<string, GenealogyRole>;  // userId -> role
+}
+
+// Permission matrix:
+// Admin: View all, Add, Edit all, Approve, Delete
+// Contributor: View approved, Add (pending), Edit own (pending)
+// Viewer: View approved only
+// None: No access to module
+```
+
+#### Approval Workflow
+
+1. Contributor adds/edits person
+2. Entry saved with `status: 'pending'`
+3. Admin sees count badge on Genealogy nav item
+4. Admin views Pending Approvals queue
+5. Admin clicks Approve or Reject (with reason)
+6. Notification sent to contributor
+
+#### Privacy Controls
+
+```typescript
+interface PrivacySettings {
+  // For living persons:
+  hideBirthDate: boolean;     // Show year only, not full date
+  hideContactInfo: boolean;   // Hide address, phone, email
+  hidePhotos: boolean;        // Only admins see photos
+  
+  // For all persons:
+  sensitiveFields: string[];  // Fields only admins can see
+  // e.g., ['causeOfDeath', 'medicalHistory']
+}
+```
+
+#### UI Updates
+
+- Add "Pending Approvals" view (admin only)
+- Add badge count to Genealogy nav item
+- Add "Status" column to list view
+- Show "Pending review" banner on unapproved items
+
+#### Deliverables
+- [ ] Approval workflow complete
+- [ ] Privacy controls for living persons
+- [ ] Admin approval queue
+- [ ] Notification to contributor on approval/rejection
