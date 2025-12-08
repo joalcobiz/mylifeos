@@ -110,7 +110,8 @@ const SettingsView: React.FC = () => {
         updateMemberRole,
         canManageAccount 
     } = useAccount();
-    const { data: settingsList, add, update } = useFirestore<Settings>('settings');
+    const { data: settingsList, add, update, upsert } = useFirestore<Settings>('settings');
+    const SETTINGS_DOC_ID = 'user-settings'; // Fixed ID for the single settings document
     const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
     const [originalSettings, setOriginalSettings] = useState<Settings | null>(null);
     const [activeSection, setActiveSection] = useState<SettingsSection>('General');
@@ -449,10 +450,12 @@ const SettingsView: React.FC = () => {
         testFirebaseConnection();
     }, []);
 
-    // Load settings from Firestore
+    // Load settings from Firestore - look for our fixed settings document
     useEffect(() => {
         if (settingsList.length > 0 && !originalSettings) {
-            const loaded = { ...DEFAULT_SETTINGS, ...settingsList[0] };
+            // Find our user-settings document, or fall back to first available
+            const userSettings = settingsList.find(s => s.id === SETTINGS_DOC_ID) || settingsList[0];
+            const loaded = { ...DEFAULT_SETTINGS, ...userSettings };
             setSettings(loaded);
             setOriginalSettings(JSON.parse(JSON.stringify(loaded)));
         }
@@ -468,12 +471,9 @@ const SettingsView: React.FC = () => {
     }, [settings, originalSettings]);
 
     const handleSave = async () => {
-        if (settingsList.length > 0) {
-            await update(settingsList[0].id, settings);
-        } else {
-            const { id, ...dataToSave } = settings;
-            await add(dataToSave);
-        }
+        const { id, ...dataToSave } = settings;
+        // Always use upsert with fixed ID for settings (singleton pattern)
+        await upsert(SETTINGS_DOC_ID, dataToSave);
         setOriginalSettings(JSON.parse(JSON.stringify(settings)));
         setIsDirty(false);
         // Toast could go here
@@ -709,12 +709,28 @@ const SettingsView: React.FC = () => {
         }
     };
 
-    // Clear stale settings cache and force refresh
-    const repairSettingsCache = useCallback(() => {
+    // Clear stale settings cache, cleanup duplicates, and force refresh
+    const repairSettingsCache = useCallback(async () => {
         if (!user) return;
-        const storageKey = `lifeos-${user.uid}-settings`;
-        localStorage.removeItem(storageKey);
-        window.location.reload();
+        try {
+            // Import and run the cleanup function
+            const { cleanupDuplicateSettings } = await import('../../services/firestore');
+            const result = await cleanupDuplicateSettings(user.uid, SETTINGS_DOC_ID);
+            console.log('[Settings] Cleanup result:', result);
+            
+            // Clear localStorage cache
+            const storageKey = `lifeos-${user.uid}-settings`;
+            localStorage.removeItem(storageKey);
+            
+            alert(`Cleaned up ${result.deleted} duplicate settings. Refreshing...`);
+            window.location.reload();
+        } catch (err) {
+            console.error('Error during settings cleanup:', err);
+            // Still clear cache and reload even if cleanup fails
+            const storageKey = `lifeos-${user.uid}-settings`;
+            localStorage.removeItem(storageKey);
+            window.location.reload();
+        }
     }, [user]);
 
     // --- MENU EDITOR LOGIC ---
@@ -724,16 +740,8 @@ const SettingsView: React.FC = () => {
         
         const { id, ...dataToSave } = updatedSettings;
         
-        // Check if we have a valid Firestore document ID
-        const hasValidFirestoreId = settingsList.length > 0 
-            && settingsList[0].id 
-            && !settingsList[0].id.startsWith('temp-');
-        
-        if (hasValidFirestoreId) {
-            await update(settingsList[0].id, updatedSettings);
-        } else {
-            await add(dataToSave as any);
-        }
+        // Always use upsert with fixed ID for settings (singleton pattern)
+        await upsert(SETTINGS_DOC_ID, dataToSave);
         
         setOriginalSettings(JSON.parse(JSON.stringify(updatedSettings)));
     };

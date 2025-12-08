@@ -9,7 +9,9 @@ import {
   deleteDoc, 
   doc,
   setDoc,
-  serverTimestamp
+  serverTimestamp,
+  getDocs,
+  writeBatch
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { useAuth } from '../contexts/AuthContext';
@@ -95,6 +97,8 @@ export function useFirestore<T extends { id: string }>(collectionName: string, i
       snapshot.forEach((doc) => {
         results.push({ id: doc.id, ...doc.data() } as T);
       });
+      
+      console.log(`[Firestore] ${collectionName}: received ${results.length} docs, fromCache=${snapshot.metadata.fromCache}`);
       
       // Update state and cache
       setData(results);
@@ -223,5 +227,92 @@ export function useFirestore<T extends { id: string }>(collectionName: string, i
     }
   };
 
-  return { data, loading, error, add, update, remove };
+  // Upsert: Create or update a document with a specific ID (useful for singleton collections like settings)
+  const upsert = async (id: string, item: Partial<T>) => {
+    if (!user) return;
+
+    // 1. Optimistic Update
+    const existingIndex = data.findIndex(d => d.id === id);
+    let newData: T[];
+    if (existingIndex >= 0) {
+      newData = data.map(d => d.id === id ? { ...d, ...item } : d);
+    } else {
+      newData = [{ ...item, id } as T];
+    }
+    updateLocal(newData);
+
+    if (isDemo) return;
+
+    try {
+      const sanitizedItem = sanitizeForFirestore(item);
+      const docRef = doc(db, 'users', user.uid, collectionName, id);
+      await setDoc(docRef, {
+        ...sanitizedItem,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+      console.log(`[Firestore] Upserted ${collectionName}/${id} successfully`);
+    } catch (err) {
+      console.error("Error upserting doc:", err);
+    }
+  };
+
+  return { data, loading, error, add, update, remove, upsert };
+}
+
+/**
+ * Cleanup duplicate settings documents - keeps only the document with the target ID
+ * If no document with targetId exists, migrates data from the first document
+ */
+export async function cleanupDuplicateSettings(
+  userId: string, 
+  targetId: string = 'user-settings'
+): Promise<{ deleted: number; migrated: boolean }> {
+  const collectionRef = collection(db, 'users', userId, 'settings');
+  const snapshot = await getDocs(query(collectionRef));
+  
+  if (snapshot.empty) {
+    return { deleted: 0, migrated: false };
+  }
+
+  const docs = snapshot.docs;
+  const targetDoc = docs.find(d => d.id === targetId);
+  let migrated = false;
+
+  // If target doesn't exist, migrate from first document
+  if (!targetDoc && docs.length > 0) {
+    const firstDoc = docs[0];
+    const targetRef = doc(db, 'users', userId, 'settings', targetId);
+    await setDoc(targetRef, {
+      ...firstDoc.data(),
+      updatedAt: serverTimestamp()
+    });
+    migrated = true;
+    console.log(`[Cleanup] Migrated settings from ${firstDoc.id} to ${targetId}`);
+  }
+
+  // Delete all documents except the target
+  const docsToDelete = docs.filter(d => d.id !== targetId);
+  
+  if (docsToDelete.length === 0) {
+    return { deleted: 0, migrated };
+  }
+
+  // Use batched writes for efficiency (max 500 per batch)
+  const batchSize = 500;
+  let deleted = 0;
+  
+  for (let i = 0; i < docsToDelete.length; i += batchSize) {
+    const batch = writeBatch(db);
+    const chunk = docsToDelete.slice(i, i + batchSize);
+    
+    chunk.forEach(d => {
+      batch.delete(d.ref);
+    });
+    
+    await batch.commit();
+    deleted += chunk.length;
+    console.log(`[Cleanup] Deleted ${deleted}/${docsToDelete.length} duplicate settings`);
+  }
+
+  return { deleted, migrated };
 }
