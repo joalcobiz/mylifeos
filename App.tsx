@@ -3,7 +3,7 @@ import {
   LayoutDashboard, FolderKanban, Wallet, CreditCard, BookOpen, MapPin, 
   Settings, FileText, Menu, Moon, X, PieChart, Calendar as CalendarIcon, Utensils, LogOut, Lock,
   Cpu, Check, ChevronLeft, ChevronRight, Route, Grid, ShoppingBag, Target, Flame, Search, Plus, Sun,
-  Eye, EyeOff
+  Eye, EyeOff, Users
 } from 'lucide-react';
 import { View, MenuItem, Settings as SettingsType } from './types';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -35,6 +35,7 @@ const ItinerariesView = lazy(() => import('./modules/Itineraries/ItinerariesView
 const HabitsView = lazy(() => import('./modules/Habits/HabitsView'));
 const GoalsView = lazy(() => import('./modules/Goals/GoalsView'));
 const PublicItineraryView = lazy(() => import('./modules/Itineraries/PublicItineraryView'));
+const GenealogyView = lazy(() => import('./modules/Genealogy/GenealogyView'));
 
 const THEMES = {
     blue: { main: '#3b82f6', hover: '#2563eb', light: '#dbeafe', muted: '#eff6ff' },
@@ -54,6 +55,7 @@ const MODULE_METADATA: Record<string, { icon: any, label: string, color: string 
     'financial': { icon: Wallet, label: 'Financial', color: 'emerald' },
     'loans': { icon: CreditCard, label: 'Money Flows', color: 'rose' },
     'journal': { icon: BookOpen, label: 'Journal', color: 'pink' },
+    'genealogy': { icon: Users, label: 'Family Tree', color: 'purple' },
     'itineraries': { icon: Route, label: 'Itineraries', color: 'indigo' },
     'places': { icon: MapPin, label: 'Places & Events', color: 'red' },
     'purchases': { icon: ShoppingBag, label: 'Shopping', color: 'amber' },
@@ -73,6 +75,7 @@ const DEFAULT_MENU_LAYOUT: MenuItem[] = [
     { id: 'm5', type: 'view', view: 'loans', isVisible: true },
     { id: 'd2', type: 'divider', isVisible: true },
     { id: 'm6', type: 'view', view: 'journal', isVisible: true },
+    { id: 'm6b', type: 'view', view: 'genealogy', isVisible: true },
     { id: 'm7', type: 'view', view: 'itineraries', isVisible: true },
     { id: 'm8', type: 'view', view: 'places', isVisible: true },
     { id: 'm9', type: 'view', view: 'purchases', isVisible: true },
@@ -576,6 +579,7 @@ function MainApp() {
                         {currentView === 'templates' && <TemplatesView />}
                         {currentView === 'documents' && <DocumentsView />}
                         {currentView === 'journal' && <JournalView focusId={viewParams.focusId} />}
+                        {currentView === 'genealogy' && <GenealogyView />}
                         {currentView === 'loans' && <LoansView />}
                         {currentView === 'purchases' && <PurchasesView />}
                         {currentView === 'financial' && <FinancialView />}

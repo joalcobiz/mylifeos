@@ -1,5 +1,5 @@
 
-export type View = 'dashboard' | 'search' | 'calendar' | 'projects' | 'financial' | 'purchases' | 'loans' | 'journal' | 'places' | 'templates' | 'documents' | 'settings' | 'reports' | 'groceries' | 'itineraries' | 'habits' | 'goals' | 'admin';
+export type View = 'dashboard' | 'search' | 'calendar' | 'projects' | 'financial' | 'purchases' | 'loans' | 'journal' | 'genealogy' | 'places' | 'templates' | 'documents' | 'settings' | 'reports' | 'groceries' | 'itineraries' | 'habits' | 'goals' | 'admin';
 
 export interface PlaceGoogleInfo {
     summary?: string;
