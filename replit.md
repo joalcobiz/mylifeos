@@ -74,6 +74,18 @@ LIFEOS (Life Operating System) is a comprehensive personal life management appli
 - Simplified user edit modal: only role, display name, and theme are editable (credentials managed by Firebase Auth)
 - AuthContext now exports: `updateUserProfile()`, `deleteUserProfile()`, `refreshAvailableUsers()`
 
+### Genealogy Module Prototype (December 2024)
+- New module: Family tree visualization with 15 mock family members across 4 generations
+- Purple/Plum theme (#9333ea) with glassmorphism styling
+- Features:
+  - Collapsible guide section with "Prototype Module" warning badge
+  - List view with search, generation filter, and sortable table
+  - Tree view mockup with stacked cards and visual connectors
+  - Person detail modal showing biography, life events, relationships
+  - Cross-module references to Places, Documents, Photos, Calendar
+- Module placement: After Journal in sidebar navigation
+- Non-functional: Add/Edit buttons disabled pending backend implementation
+
 ## System Architecture
 LIFEOS is built with React (TypeScript) and Vite. Styling is handled with Tailwind CSS. The application features a multi-user architecture with role-based access control, data ownership tracking, and selective data sharing capabilities. Key architectural decisions include:
 
