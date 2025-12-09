@@ -6,7 +6,7 @@ import {
     Flame, Target, FileText, Banknote, Check, MoreHorizontal, Eye, Zap,
     Settings, GripVertical, ChevronUp, ChevronDown, EyeOff, ListTodo,
     Sun, Cloud, Phone, Users, Bell, History, AlertOctagon, Star, Heart,
-    Gift, Cake, Route, Camera, Plane, User
+    Gift, Cake, Route, Camera, Plane, User, Rocket, Wrench, Package
 } from 'lucide-react';
 import { useFirestore } from '../../services/firestore';
 import { ProjectItem, FinancialItem, JournalEntry, Place, SearchResult, GroceryItem, Purchase, Habit, Goal, Itinerary, Settings as SettingsType, DashboardWidget } from '../../types';
@@ -773,6 +773,59 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
         return items.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()).slice(0, 5);
     }, [filteredProjects, filteredJournal]);
 
+    const upcomingFeatures = useMemo(() => [
+        {
+            id: '1',
+            name: 'Calendar Module',
+            type: 'module' as const,
+            description: 'Full calendar view with event scheduling and reminders',
+            status: 'Planned' as const,
+            difficulty: 'Hard' as const
+        },
+        {
+            id: '2',
+            name: 'Documents Module',
+            type: 'module' as const,
+            description: 'Document storage and organization with tagging',
+            status: 'Planned' as const,
+            difficulty: 'Medium' as const
+        },
+        {
+            id: '3',
+            name: 'Templates Module',
+            type: 'module' as const,
+            description: 'Reusable templates for projects, goals, and habits',
+            status: 'Planned' as const,
+            difficulty: 'Medium' as const
+        },
+        {
+            id: '4',
+            name: 'Loans Module',
+            type: 'module' as const,
+            description: 'Track loans given and received with reminders',
+            status: 'In Progress' as const,
+            difficulty: 'Easy' as const
+        },
+        {
+            id: '5',
+            name: 'AI Insights',
+            type: 'improvement' as const,
+            targetModule: 'Dashboard',
+            description: 'AI-powered daily insights and recommendations',
+            status: 'Planned' as const,
+            difficulty: 'Hard' as const
+        },
+        {
+            id: '6',
+            name: 'Recurring Transactions',
+            type: 'improvement' as const,
+            targetModule: 'Financial',
+            description: 'Auto-create recurring income and expenses',
+            status: 'Planned' as const,
+            difficulty: 'Medium' as const
+        }
+    ], []);
+
     const moduleCards = useMemo(() => [
         {
             id: 'projects',
@@ -1186,6 +1239,61 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                     );
                 })}
             </div>
+
+            {user?.isSystemAdmin && (
+                <CollapsibleSection
+                    title="Upcoming Features"
+                    icon={<Rocket size={16} />}
+                    badge={upcomingFeatures.length}
+                    pillColor="bg-violet-100 text-violet-700"
+                    defaultExpanded={false}
+                >
+                    <div className="pt-1">
+                        {upcomingFeatures.map(feature => (
+                            <div
+                                key={feature.id}
+                                className="flex items-start gap-3 py-3 px-3 my-2 rounded-lg bg-white border border-gray-200 shadow-sm"
+                            >
+                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                                    feature.type === 'module' ? 'bg-indigo-100' : 'bg-amber-100'
+                                }`}>
+                                    {feature.type === 'module' ? (
+                                        <Package size={16} className="text-indigo-600" />
+                                    ) : (
+                                        <Wrench size={16} className="text-amber-600" />
+                                    )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <span className="font-medium text-gray-900 text-sm">{feature.name}</span>
+                                        {feature.targetModule && (
+                                            <span className="text-xs text-gray-400">({feature.targetModule})</span>
+                                        )}
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-0.5">{feature.description}</p>
+                                    <div className="flex items-center gap-2 mt-2 flex-wrap">
+                                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                                            feature.status === 'Planned' ? 'bg-gray-100 text-gray-600' :
+                                            feature.status === 'In Progress' ? 'bg-blue-100 text-blue-700' :
+                                            feature.status === 'Testing' ? 'bg-amber-100 text-amber-700' :
+                                            'bg-green-100 text-green-700'
+                                        }`}>
+                                            {feature.status}
+                                        </span>
+                                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                                            feature.difficulty === 'Easy' ? 'bg-green-50 text-green-600' :
+                                            feature.difficulty === 'Medium' ? 'bg-yellow-50 text-yellow-600' :
+                                            'bg-red-50 text-red-600'
+                                        }`}>
+                                            {feature.difficulty}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </CollapsibleSection>
+            )}
         </div>
     );
 };
