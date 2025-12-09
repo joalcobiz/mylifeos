@@ -93,7 +93,7 @@ const ActionItem: React.FC<ActionItemProps> = ({
     isCompleted = false
 }) => {
     return (
-        <div className={`flex items-center gap-3 py-2.5 px-3 my-2 rounded-lg bg-gray-50 border border-gray-200 shadow-sm ${hoverColor} hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer ${isCompleted ? 'opacity-50' : ''}`}>
+        <div className={`flex items-center gap-3 py-2.5 px-3 my-2 rounded-lg bg-white border border-gray-200 shadow-sm ${hoverColor} hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer ${isCompleted ? 'opacity-50' : ''}`}>
             <div className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
                 {icon}
             </div>
@@ -841,7 +841,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
     ], [filteredProjects, filteredGoals, filteredHabits, filteredItineraries, filteredPlaces, filteredFinancial, filteredGroceries, filteredJournal]);
 
     return (
-        <div className="space-y-4 animate-enter bg-white -m-6 p-6">
+        <div className="space-y-4 animate-enter bg-gray-50 -m-6 p-6">
             <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 rounded-2xl p-5 text-white shadow-lg">
                 <div className="flex items-center justify-between flex-wrap gap-4">
                     <div>
@@ -874,8 +874,8 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
             </div>
 
             {onThisDayItems.length > 0 && (
-                <div className="bg-gradient-to-r from-purple-50 via-violet-50 to-indigo-50 rounded-2xl border border-purple-100 overflow-hidden">
-                    <div className="flex items-center justify-between px-4 py-3 border-b border-purple-100">
+                <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
                         <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
                                 <History size={16} className="text-white" />
@@ -1116,7 +1116,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                 <button
                                     key={item.id}
                                     onClick={() => handleNavigate(moduleToRoute[item.module] || item.module.toLowerCase(), item.id)}
-                                    className="w-full flex items-center gap-3 py-2.5 px-3 my-2 rounded-lg bg-gray-50 border border-gray-200 shadow-sm hover:bg-slate-100 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-left"
+                                    className="w-full flex items-center gap-3 py-2.5 px-3 my-2 rounded-lg bg-white border border-gray-200 shadow-sm hover:bg-slate-100 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-left"
                                 >
                                     <div className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
                                         <IconComponent size={14} className="text-gray-500" />
@@ -1168,7 +1168,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                         <button
                                             key={item.id}
                                             onClick={() => handleNavigate(card.id, item.id)}
-                                            className={`w-full flex items-center gap-3 py-2.5 px-3 my-2 rounded-lg text-left bg-gray-50 border border-gray-200 shadow-sm ${card.cardHover} hover:shadow-md hover:-translate-y-0.5 transition-all duration-200`}
+                                            className={`w-full flex items-center gap-3 py-2.5 px-3 my-2 rounded-lg text-left bg-white border border-gray-200 shadow-sm ${card.cardHover} hover:shadow-md hover:-translate-y-0.5 transition-all duration-200`}
                                         >
                                             <div className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
                                                 <IconComponent size={14} className="text-gray-500" />
