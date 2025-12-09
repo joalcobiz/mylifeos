@@ -164,8 +164,37 @@ LIFEOS is built with React (TypeScript) and Vite. Styling is handled with Tailwi
 
 | Feature Name | Explanation | Module | Access | Images | Complexity | ETA |
 |-------------|-------------|--------|--------|--------|------------|-----|
-| Action Center Dashboard | Redesign Dashboard as comprehensive action hub with collapsible sections for Tasks, Habits, Goals, Financial summaries, and individual module cards | Dashboard | AllUsers | TBD | High | TBD |
+| Action Center Dashboard | Redesign Dashboard as comprehensive action hub with collapsible sections for Tasks, Habits, Goals, Financial summaries, and individual module cards | Dashboard | AllUsers | `attached_assets/image_1765247634260.png` | High | TBD |
 | *Add more features below* | | | | | | |
+
+### Action Center Dashboard - Detailed Specification
+
+**Header Section:**
+- Personalized greeting with date and weather icon
+- Quick stats bar: streak count, tasks today, events count, birthday/anniversary reminders
+
+**Main Layout (Two Columns):**
+
+**Left Column - Action Center:**
+Collapsible sections organized by urgency/category:
+1. **On This Day** (Orange) - Family history events, past memories/journal entries, "View History" link
+2. **Overdue** (Red badge) - Past-due items with "Complete" buttons
+3. **Today** (Orange badge) - Current day items with contextual action buttons (Call, Join, View List, Pay Now, Log Now, Review, Write)
+4. **Upcoming** (Blue badge) - Future items with "View" buttons
+5. **For You** (Purple badge) - AI-suggested actions, reminders to revisit places, goal check-ins
+6. **Family Activity** (Teal badge) - Recent actions by group members with "View" buttons
+
+**Right Column - Widgets:**
+1. **This Week Stats** - Grid showing: Tasks Done, Habits %, Journal Entries, Money Spent
+2. **Needs Attention** - Alert items requiring action (expiring docs, wishlist items, incomplete profiles)
+3. **Recent Activity** - Module activity summaries (Projects active/completed, Financial status, Family Tree members, Trips countdown)
+
+**Features:**
+- Each action item shows: module icon (color-coded), title, description, source module, timestamp, and contextual action buttons
+- View toggle: "Timeline | Category | Module" tabs
+- Layout toggle: "Separate | Combined" for sidebar position
+- All sections are collapsible with item count badges
+- Responsive design for mobile
 
 ---
 
