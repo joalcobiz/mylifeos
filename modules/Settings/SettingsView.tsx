@@ -1880,9 +1880,36 @@ const SettingsView: React.FC = () => {
                                                             </div>
                                                         </div>
                                                         <div className="flex gap-1">
-                                                            {u.isSystemAdmin && (
+                                                            {user?.isSystemAdmin && u.uid !== user?.uid && (
+                                                                <button
+                                                                    onClick={async () => {
+                                                                        const newStatus = !u.isSystemAdmin;
+                                                                        if (newStatus || (!newStatus && confirm('Remove superadmin privileges from this user?'))) {
+                                                                            try {
+                                                                                await updateUserProfile(u.uid, {
+                                                                                    isSystemAdmin: newStatus,
+                                                                                    role: newStatus ? 'Admin' : u.role
+                                                                                });
+                                                                                refreshAvailableUsers();
+                                                                            } catch (error) {
+                                                                                alert('Failed to update user');
+                                                                            }
+                                                                        }
+                                                                    }}
+                                                                    className={`text-xs font-medium px-2 py-1 rounded-full transition-colors ${
+                                                                        u.isSystemAdmin 
+                                                                            ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' 
+                                                                            : 'bg-gray-100 text-gray-500 hover:bg-amber-100 hover:text-amber-700'
+                                                                    }`}
+                                                                    title={u.isSystemAdmin ? 'Click to remove superadmin' : 'Click to make superadmin'}
+                                                                >
+                                                                    <Crown size={12} className="inline mr-1" />
+                                                                    {u.isSystemAdmin ? 'Superadmin' : 'Make Superadmin'}
+                                                                </button>
+                                                            )}
+                                                            {(!user?.isSystemAdmin || u.uid === user?.uid) && u.isSystemAdmin && (
                                                                 <span className="text-xs font-medium px-2 py-1 rounded-full bg-amber-100 text-amber-700">
-                                                                    System
+                                                                    <Crown size={12} className="inline mr-1" />Superadmin
                                                                 </span>
                                                             )}
                                                             <span className={`text-xs font-medium px-2 py-1 rounded-full ${u.isAdmin ? 'bg-purple-100 text-purple-700' : 'bg-gray-200 text-gray-600'}`}>
