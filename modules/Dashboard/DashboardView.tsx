@@ -704,33 +704,168 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
         return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     };
 
+    const recentItems = useMemo(() => {
+        const items: Array<{
+            id: string;
+            type: string;
+            title: string;
+            subtitle: string;
+            module: string;
+            date: string;
+            icon: typeof FolderKanban;
+            iconBg: string;
+            iconColor: string;
+        }> = [];
+        
+        filteredProjects.slice(0, 3).forEach(p => {
+            if (p.createdDate) {
+                items.push({
+                    id: p.id,
+                    type: 'project',
+                    title: p.name,
+                    subtitle: p.status,
+                    module: 'Projects',
+                    date: p.createdDate,
+                    icon: FolderKanban,
+                    iconBg: 'bg-blue-100',
+                    iconColor: 'text-blue-600'
+                });
+            }
+        });
+        
+        filteredJournal.slice(0, 2).forEach(j => {
+            items.push({
+                id: j.id,
+                type: 'journal',
+                title: j.title || 'Journal Entry',
+                subtitle: j.mood || '',
+                module: 'Journal',
+                date: j.date,
+                icon: BookOpen,
+                iconBg: 'bg-amber-100',
+                iconColor: 'text-amber-600'
+            });
+        });
+        
+        filteredItineraries.slice(0, 2).forEach(t => {
+            items.push({
+                id: t.id,
+                type: 'trip',
+                title: t.name,
+                subtitle: t.status,
+                module: 'Trips',
+                date: t.startDate || '',
+                icon: Route,
+                iconBg: 'bg-cyan-100',
+                iconColor: 'text-cyan-600'
+            });
+        });
+        
+        return items.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
+    }, [filteredProjects, filteredJournal, filteredItineraries]);
+
+    const moduleCards = useMemo(() => [
+        {
+            id: 'projects',
+            name: 'Projects',
+            icon: FolderKanban,
+            count: filteredProjects.filter(p => p.status !== 'Completed').length,
+            color: 'from-blue-500 to-blue-600',
+            bgTint: 'bg-blue-50',
+            borderColor: 'border-blue-100'
+        },
+        {
+            id: 'goals',
+            name: 'Goals',
+            icon: Target,
+            count: filteredGoals.filter(g => g.status !== 'Completed').length,
+            color: 'from-red-500 to-rose-600',
+            bgTint: 'bg-red-50',
+            borderColor: 'border-red-100'
+        },
+        {
+            id: 'habits',
+            name: 'Habits',
+            icon: Flame,
+            count: filteredHabits.length,
+            color: 'from-orange-500 to-amber-600',
+            bgTint: 'bg-orange-50',
+            borderColor: 'border-orange-100'
+        },
+        {
+            id: 'itineraries',
+            name: 'Trips',
+            icon: Route,
+            count: filteredItineraries.filter(t => t.status !== 'Completed').length,
+            color: 'from-cyan-500 to-teal-600',
+            bgTint: 'bg-cyan-50',
+            borderColor: 'border-cyan-100'
+        },
+        {
+            id: 'places',
+            name: 'Places',
+            icon: MapPin,
+            count: filteredPlaces.length,
+            color: 'from-rose-500 to-pink-600',
+            bgTint: 'bg-rose-50',
+            borderColor: 'border-rose-100'
+        },
+        {
+            id: 'financial',
+            name: 'Financial',
+            icon: Wallet,
+            count: filteredFinancial.length,
+            color: 'from-emerald-500 to-green-600',
+            bgTint: 'bg-emerald-50',
+            borderColor: 'border-emerald-100'
+        },
+        {
+            id: 'groceries',
+            name: 'Groceries',
+            icon: ShoppingBag,
+            count: filteredGroceries.filter(g => !g.completed).length,
+            color: 'from-lime-500 to-green-600',
+            bgTint: 'bg-lime-50',
+            borderColor: 'border-lime-100'
+        },
+        {
+            id: 'journal',
+            name: 'Journal',
+            icon: BookOpen,
+            count: filteredJournal.length,
+            color: 'from-amber-500 to-yellow-600',
+            bgTint: 'bg-amber-50',
+            borderColor: 'border-amber-100'
+        }
+    ], [filteredProjects, filteredGoals, filteredHabits, filteredItineraries, filteredPlaces, filteredFinancial, filteredGroceries, filteredJournal]);
+
     return (
         <div className="space-y-6 animate-enter">
-            <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-6 text-white shadow-lg">
+            <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 rounded-2xl p-6 text-white shadow-lg">
                 <div className="flex items-center justify-between flex-wrap gap-4">
                     <div>
                         <div className="flex items-center gap-2 mb-1">
                             <h1 className="text-2xl font-bold">{getGreeting()}, {user?.displayName?.split(' ')[0] || 'there'}!</h1>
-                            <Sun className="text-yellow-300" size={24} />
+                            <Sun className="text-yellow-400" size={24} />
                         </div>
-                        <p className="text-indigo-100">{formatDate()}</p>
+                        <p className="text-gray-400">{formatDate()}</p>
                     </div>
                 </div>
                 
-                <div className="flex flex-wrap items-center gap-4 mt-4 pt-4 border-t border-white/20">
+                <div className="flex flex-wrap items-center gap-4 mt-4 pt-4 border-t border-white/10">
                     {stats.streak > 0 && (
-                        <div className="flex items-center gap-2 bg-white/20 rounded-lg px-3 py-1.5">
-                            <Flame size={16} className="text-orange-300" />
+                        <div className="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-1.5">
+                            <Flame size={16} className="text-orange-400" />
                             <span className="text-sm font-medium">{stats.streak}-day streak</span>
                         </div>
                     )}
-                    <div className="flex items-center gap-2 bg-white/20 rounded-lg px-3 py-1.5">
-                        <CheckCircle size={16} className="text-green-300" />
+                    <div className="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-1.5">
+                        <CheckCircle size={16} className="text-green-400" />
                         <span className="text-sm font-medium">{stats.tasksToday} tasks today</span>
                     </div>
                     {stats.upcomingTrips > 0 && (
-                        <div className="flex items-center gap-2 bg-white/20 rounded-lg px-3 py-1.5">
-                            <Route size={16} className="text-cyan-300" />
+                        <div className="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-1.5">
+                            <Route size={16} className="text-cyan-400" />
                             <span className="text-sm font-medium">{stats.upcomingTrips} upcoming trips</span>
                         </div>
                     )}
@@ -738,10 +873,10 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
             </div>
 
             {onThisDayItems.length > 0 && (
-                <div className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl border border-orange-100 overflow-hidden">
-                    <div className="flex items-center justify-between px-4 py-3 border-b border-orange-100">
+                <div className="bg-gradient-to-r from-purple-50 via-violet-50 to-indigo-50 rounded-2xl border border-purple-100 overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-purple-100">
                         <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center">
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
                                 <History size={16} className="text-white" />
                             </div>
                             <div>
@@ -755,13 +890,13 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                 <div className="flex gap-1">
                                     <button
                                         onClick={() => setOnThisDayIndex((prev) => (prev === 0 ? onThisDayItems.length - 1 : prev - 1))}
-                                        className="w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center shadow-sm border border-orange-100 transition-colors"
+                                        className="w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center shadow-sm border border-purple-100 transition-colors"
                                     >
                                         <ChevronLeft size={16} className="text-gray-600" />
                                     </button>
                                     <button
                                         onClick={() => setOnThisDayIndex((prev) => (prev === onThisDayItems.length - 1 ? 0 : prev + 1))}
-                                        className="w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center shadow-sm border border-orange-100 transition-colors"
+                                        className="w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center shadow-sm border border-purple-100 transition-colors"
                                     >
                                         <ChevronRight size={16} className="text-gray-600" />
                                     </button>
@@ -783,7 +918,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                         <div className="flex-1 min-w-0">
                                             <p className="font-semibold text-gray-900 truncate">{item.title}</p>
                                             <p className="text-sm text-gray-500">{item.subtitle}</p>
-                                            <p className="text-xs text-orange-600 mt-1 font-medium">{item.year}</p>
+                                            <p className="text-xs text-purple-600 mt-1 font-medium">{item.year}</p>
                                         </div>
                                         <button
                                             onClick={() => {
@@ -792,7 +927,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                                 else if (item.type === 'place') handleNavigate('places', item.id.split('-')[0]);
                                                 else if (item.type === 'family') handleNavigate('genealogy', item.id);
                                             }}
-                                            className="px-4 py-2 bg-orange-500 text-white text-sm font-medium rounded-lg hover:bg-orange-600 transition-colors flex-shrink-0"
+                                            className="px-4 py-2 bg-purple-500 text-white text-sm font-medium rounded-lg hover:bg-purple-600 transition-colors flex-shrink-0"
                                         >
                                             View
                                         </button>
@@ -807,7 +942,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                         key={idx}
                                         onClick={() => setOnThisDayIndex(idx)}
                                         className={`w-2 h-2 rounded-full transition-colors ${
-                                            idx === onThisDayIndex ? 'bg-orange-500' : 'bg-orange-200 hover:bg-orange-300'
+                                            idx === onThisDayIndex ? 'bg-purple-500' : 'bg-purple-200 hover:bg-purple-300'
                                         }`}
                                     />
                                 ))}
@@ -817,51 +952,23 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                 </div>
             )}
 
-            <form onSubmit={handleQuickNoteSubmit} className="relative">
-                <Card variant="gradient" padding="none" className="overflow-hidden">
-                    <div className="flex items-center gap-3 p-4">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg shadow-primary/20">
-                            <Zap size={20} className="text-white" />
-                        </div>
-                        <input
-                            type="text"
-                            value={quickNote}
-                            onChange={(e) => setQuickNote(e.target.value)}
-                            placeholder="Quick capture: Add a task, note, or idea..."
-                            className="flex-1 bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none text-sm"
-                        />
-                        <Button type="submit" variant="primary" size="sm" icon={Send} disabled={!quickNote.trim()}>
-                            Add
-                        </Button>
-                    </div>
-                </Card>
-                {quickNoteSuccess && (
-                    <div className="absolute left-0 right-0 top-full mt-2 bg-green-50 text-green-800 text-sm p-3 rounded-lg border border-green-200 flex items-center gap-2 animate-enter">
-                        <Check size={16} className="text-green-600" />
-                        Added "{quickNoteSuccess.name}" to Quick Notes
-                    </div>
-                )}
-            </form>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-white/70 backdrop-blur rounded-xl p-4 border border-gray-100 text-center">
-                    <p className="text-3xl font-bold text-gray-900">{stats.completedToday}</p>
-                    <p className="text-sm text-gray-500">Tasks Done</p>
-                </div>
-                <div className="bg-white/70 backdrop-blur rounded-xl p-4 border border-gray-100 text-center">
-                    <p className="text-3xl font-bold text-gray-900">
-                        {stats.totalHabits > 0 ? Math.round((stats.todayHabits / stats.totalHabits) * 100) : 0}%
-                    </p>
-                    <p className="text-sm text-gray-500">Habits</p>
-                </div>
-                <div className="bg-white/70 backdrop-blur rounded-xl p-4 border border-gray-100 text-center">
-                    <p className="text-3xl font-bold text-gray-900">{stats.journalCount}</p>
-                    <p className="text-sm text-gray-500">Journal Entries</p>
-                </div>
-                <div className="bg-white/70 backdrop-blur rounded-xl p-4 border border-gray-100 text-center">
-                    <p className="text-3xl font-bold text-emerald-600">${stats.totalExpenses.toLocaleString()}</p>
-                    <p className="text-sm text-gray-500">Spent</p>
-                </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {moduleCards.map(card => {
+                    const IconComponent = card.icon;
+                    return (
+                        <button
+                            key={card.id}
+                            onClick={() => handleNavigate(card.id)}
+                            className={`${card.bgTint} ${card.borderColor} border rounded-xl p-4 text-left hover:shadow-md transition-all group`}
+                        >
+                            <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${card.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
+                                <IconComponent size={20} className="text-white" />
+                            </div>
+                            <p className="font-semibold text-gray-900">{card.name}</p>
+                            <p className="text-sm text-gray-500">{card.count} active</p>
+                        </button>
+                    );
+                })}
             </div>
 
             <div className="space-y-4">
@@ -985,6 +1092,47 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                         </div>
                     </CollapsibleSection>
                 )}
+            </div>
+
+            <div className="bg-gradient-to-r from-slate-50 via-gray-50 to-zinc-50 rounded-2xl border border-slate-200 overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-500 to-gray-600 flex items-center justify-center">
+                            <Clock size={16} className="text-white" />
+                        </div>
+                        <div>
+                            <h3 className="font-semibold text-gray-900">Recent Activity</h3>
+                            <p className="text-xs text-gray-500">Your latest updates</p>
+                        </div>
+                    </div>
+                </div>
+                <div className="p-4">
+                    {recentItems.length === 0 ? (
+                        <p className="text-gray-400 text-sm text-center py-4">No recent activity</p>
+                    ) : (
+                        <div className="space-y-3">
+                            {recentItems.map(item => {
+                                const IconComponent = item.icon;
+                                return (
+                                    <button
+                                        key={item.id}
+                                        onClick={() => handleNavigate(moduleToRoute[item.module] || item.module.toLowerCase(), item.id)}
+                                        className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/80 transition-colors text-left"
+                                    >
+                                        <div className={`w-10 h-10 rounded-lg ${item.iconBg} flex items-center justify-center flex-shrink-0`}>
+                                            <IconComponent size={18} className={item.iconColor} />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="font-medium text-gray-900 truncate">{item.title}</p>
+                                            <p className="text-xs text-gray-500">{item.module} • {item.subtitle}</p>
+                                        </div>
+                                        <ChevronRight size={16} className="text-gray-400 flex-shrink-0" />
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
