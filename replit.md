@@ -146,6 +146,7 @@ LIFEOS is built with React (TypeScript) and Vite. Styling is handled with Tailwi
     -   **Habits & Goals:** Tracking with visualizations
     -   **Action Center Dashboard:** Redesigned comprehensive dashboard with:
         - Personalized greeting header with date and quick stats (streak, tasks today, upcoming trips)
+        - "On This Day" carousel showing memories from years past (trips, journal entries, places visited, family events)
         - Quick capture input for fast task/note entry
         - This Week stats grid (Tasks Done, Habits %, Journal Entries, Money Spent)
         - Collapsible sections: Overdue (red), Today (orange), Upcoming (blue), For You (purple)

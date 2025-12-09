@@ -2,11 +2,11 @@ import React, { useState, useMemo } from 'react';
 import { 
     LayoutDashboard, CheckCircle, Clock, TrendingUp, AlertCircle, 
     Calendar as CalendarIcon, MapPin, Search, ArrowRight, FolderKanban, 
-    Wallet, BookOpen, X, Sparkles, Plus, Send, ChevronRight, ShoppingBag, Utensils,
+    Wallet, BookOpen, X, Sparkles, Plus, Send, ChevronRight, ChevronLeft, ShoppingBag, Utensils,
     Flame, Target, FileText, Banknote, Check, MoreHorizontal, Eye, Zap,
     Settings, GripVertical, ChevronUp, ChevronDown, EyeOff, ListTodo,
     Sun, Cloud, Phone, Users, Bell, History, AlertOctagon, Star, Heart,
-    Gift, Cake, Route
+    Gift, Cake, Route, Camera, Plane, User
 } from 'lucide-react';
 import { useFirestore } from '../../services/firestore';
 import { ProjectItem, FinancialItem, JournalEntry, Place, SearchResult, GroceryItem, Purchase, Habit, Goal, Itinerary, Settings as SettingsType, DashboardWidget } from '../../types';
@@ -207,9 +207,12 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
 
     const [quickNote, setQuickNote] = useState('');
     const [quickNoteSuccess, setQuickNoteSuccess] = useState<{id: string, name: string} | null>(null);
+    const [onThisDayIndex, setOnThisDayIndex] = useState(0);
 
     const today = new Date();
     const todayStr = today.toISOString().split('T')[0];
+    const todayMonth = today.getMonth();
+    const todayDay = today.getDate();
     
     const getGreeting = () => {
         const hour = today.getHours();
@@ -464,6 +467,130 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
         return items.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()).slice(0, 5);
     }, [filteredProjects, filteredGoals, filteredItineraries, todayStr]);
 
+    const onThisDayItems = useMemo(() => {
+        const items: Array<{
+            id: string;
+            type: 'trip' | 'journal' | 'place' | 'family';
+            title: string;
+            subtitle: string;
+            year: number;
+            yearsAgo: number;
+            icon: typeof Plane;
+            iconBg: string;
+            iconColor: string;
+            image?: string;
+        }> = [];
+        
+        const currentYear = today.getFullYear();
+        
+        filteredItineraries.forEach(trip => {
+            if (trip.startDate) {
+                const tripDate = new Date(trip.startDate);
+                if (tripDate.getMonth() === todayMonth && tripDate.getDate() === todayDay && tripDate.getFullYear() < currentYear) {
+                    const yearsAgo = currentYear - tripDate.getFullYear();
+                    items.push({
+                        id: trip.id,
+                        type: 'trip',
+                        title: trip.name,
+                        subtitle: `Trip from ${yearsAgo} year${yearsAgo > 1 ? 's' : ''} ago`,
+                        year: tripDate.getFullYear(),
+                        yearsAgo,
+                        icon: Plane,
+                        iconBg: 'bg-cyan-100',
+                        iconColor: 'text-cyan-600',
+                        image: trip.coverImage
+                    });
+                }
+            }
+        });
+        
+        filteredJournal.forEach(entry => {
+            if (entry.date) {
+                const entryDate = new Date(entry.date);
+                if (entryDate.getMonth() === todayMonth && entryDate.getDate() === todayDay && entryDate.getFullYear() < currentYear) {
+                    const yearsAgo = currentYear - entryDate.getFullYear();
+                    items.push({
+                        id: entry.id,
+                        type: 'journal',
+                        title: entry.title || 'Journal Entry',
+                        subtitle: `Written ${yearsAgo} year${yearsAgo > 1 ? 's' : ''} ago`,
+                        year: entryDate.getFullYear(),
+                        yearsAgo,
+                        icon: BookOpen,
+                        iconBg: 'bg-amber-100',
+                        iconColor: 'text-amber-600'
+                    });
+                }
+            }
+        });
+        
+        filteredPlaces.forEach(place => {
+            if (place.lastVisited) {
+                const visitDate = new Date(place.lastVisited);
+                if (visitDate.getMonth() === todayMonth && visitDate.getDate() === todayDay && visitDate.getFullYear() < currentYear) {
+                    const yearsAgo = currentYear - visitDate.getFullYear();
+                    items.push({
+                        id: place.id,
+                        type: 'place',
+                        title: place.name,
+                        subtitle: `Visited ${yearsAgo} year${yearsAgo > 1 ? 's' : ''} ago`,
+                        year: visitDate.getFullYear(),
+                        yearsAgo,
+                        icon: MapPin,
+                        iconBg: 'bg-rose-100',
+                        iconColor: 'text-rose-600'
+                    });
+                }
+            }
+            place.visitHistory?.forEach(visit => {
+                const visitDate = new Date(visit.date);
+                if (visitDate.getMonth() === todayMonth && visitDate.getDate() === todayDay && visitDate.getFullYear() < currentYear) {
+                    const yearsAgo = currentYear - visitDate.getFullYear();
+                    if (!items.find(i => i.id === `${place.id}-${visit.id}`)) {
+                        items.push({
+                            id: `${place.id}-${visit.id}`,
+                            type: 'place',
+                            title: place.name,
+                            subtitle: `Visited ${yearsAgo} year${yearsAgo > 1 ? 's' : ''} ago`,
+                            year: visitDate.getFullYear(),
+                            yearsAgo,
+                            icon: Camera,
+                            iconBg: 'bg-violet-100',
+                            iconColor: 'text-violet-600'
+                        });
+                    }
+                }
+            });
+        });
+        
+        const mockFamilyEvents = [
+            { id: 'fam-1', name: 'Grandma Rose', event: 'birthday', month: todayMonth, day: todayDay, year: 1935 },
+            { id: 'fam-2', name: 'Uncle James', event: 'anniversary', month: todayMonth, day: todayDay, year: 1990 },
+        ];
+        
+        mockFamilyEvents.forEach(member => {
+            if (member.month === todayMonth && member.day === todayDay) {
+                items.push({
+                    id: member.id,
+                    type: 'family',
+                    title: member.event === 'birthday' 
+                        ? `Remembering ${member.name}` 
+                        : `${member.name}'s Anniversary`,
+                    subtitle: member.event === 'birthday'
+                        ? `Would be ${currentYear - member.year} years old today`
+                        : `${currentYear - member.year} years since this day`,
+                    year: member.year,
+                    yearsAgo: currentYear - member.year,
+                    icon: member.event === 'birthday' ? Cake : Heart,
+                    iconBg: member.event === 'birthday' ? 'bg-pink-100' : 'bg-red-100',
+                    iconColor: member.event === 'birthday' ? 'text-pink-600' : 'text-red-600'
+                });
+            }
+        });
+        
+        return items.sort((a, b) => b.yearsAgo - a.yearsAgo);
+    }, [filteredItineraries, filteredJournal, filteredPlaces, todayMonth, todayDay, today]);
+
     const forYouItems = useMemo(() => {
         const items: any[] = [];
         
@@ -609,6 +736,86 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                     )}
                 </div>
             </div>
+
+            {onThisDayItems.length > 0 && (
+                <div className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl border border-orange-100 overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-orange-100">
+                        <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center">
+                                <History size={16} className="text-white" />
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-gray-900">On This Day</h3>
+                                <p className="text-xs text-gray-500">Memories from years past</p>
+                            </div>
+                        </div>
+                        {onThisDayItems.length > 1 && (
+                            <div className="flex items-center gap-2">
+                                <span className="text-xs text-gray-400">{onThisDayIndex + 1} of {onThisDayItems.length}</span>
+                                <div className="flex gap-1">
+                                    <button
+                                        onClick={() => setOnThisDayIndex((prev) => (prev === 0 ? onThisDayItems.length - 1 : prev - 1))}
+                                        className="w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center shadow-sm border border-orange-100 transition-colors"
+                                    >
+                                        <ChevronLeft size={16} className="text-gray-600" />
+                                    </button>
+                                    <button
+                                        onClick={() => setOnThisDayIndex((prev) => (prev === onThisDayItems.length - 1 ? 0 : prev + 1))}
+                                        className="w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center shadow-sm border border-orange-100 transition-colors"
+                                    >
+                                        <ChevronRight size={16} className="text-gray-600" />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                    <div className="p-4">
+                        <div className="flex items-center gap-4 transition-all duration-300">
+                            {(() => {
+                                const item = onThisDayItems[onThisDayIndex];
+                                if (!item) return null;
+                                const IconComponent = item.icon;
+                                return (
+                                    <div className="flex items-center gap-4 w-full">
+                                        <div className={`w-14 h-14 rounded-xl ${item.iconBg} flex items-center justify-center flex-shrink-0 shadow-sm`}>
+                                            <IconComponent size={24} className={item.iconColor} />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="font-semibold text-gray-900 truncate">{item.title}</p>
+                                            <p className="text-sm text-gray-500">{item.subtitle}</p>
+                                            <p className="text-xs text-orange-600 mt-1 font-medium">{item.year}</p>
+                                        </div>
+                                        <button
+                                            onClick={() => {
+                                                if (item.type === 'trip') handleNavigate('itineraries', item.id);
+                                                else if (item.type === 'journal') handleNavigate('journal', item.id);
+                                                else if (item.type === 'place') handleNavigate('places', item.id.split('-')[0]);
+                                                else if (item.type === 'family') handleNavigate('genealogy', item.id);
+                                            }}
+                                            className="px-4 py-2 bg-orange-500 text-white text-sm font-medium rounded-lg hover:bg-orange-600 transition-colors flex-shrink-0"
+                                        >
+                                            View
+                                        </button>
+                                    </div>
+                                );
+                            })()}
+                        </div>
+                        {onThisDayItems.length > 1 && (
+                            <div className="flex justify-center gap-1.5 mt-4">
+                                {onThisDayItems.map((_, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => setOnThisDayIndex(idx)}
+                                        className={`w-2 h-2 rounded-full transition-colors ${
+                                            idx === onThisDayIndex ? 'bg-orange-500' : 'bg-orange-200 hover:bg-orange-300'
+                                        }`}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
 
             <form onSubmit={handleQuickNoteSubmit} className="relative">
                 <Card variant="gradient" padding="none" className="overflow-hidden">
