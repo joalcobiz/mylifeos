@@ -83,6 +83,8 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
 interface ActionItemProps {
     icon: React.ReactNode;
     iconBg: string;
+    cardBg?: string;
+    cardHover?: string;
     title: string;
     subtitle: string;
     module: string;
@@ -95,6 +97,8 @@ interface ActionItemProps {
 const ActionItem: React.FC<ActionItemProps> = ({
     icon,
     iconBg,
+    cardBg = 'bg-white/60',
+    cardHover = 'hover:bg-white',
     title,
     subtitle,
     module,
@@ -104,7 +108,7 @@ const ActionItem: React.FC<ActionItemProps> = ({
     isCompleted = false
 }) => {
     return (
-        <div className={`flex items-center gap-3 py-2 border-b border-gray-50 last:border-0 ${isCompleted ? 'opacity-50' : ''}`}>
+        <div className={`flex items-center gap-3 py-2.5 px-3 my-1 rounded-lg border border-transparent ${cardBg} ${cardHover} hover:shadow-md hover:border-gray-200/50 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer ${isCompleted ? 'opacity-50' : ''}`}>
             <div className={`w-8 h-8 rounded-lg ${iconBg} flex items-center justify-center flex-shrink-0`}>
                 {icon}
             </div>
@@ -115,8 +119,8 @@ const ActionItem: React.FC<ActionItemProps> = ({
             <div className="flex items-center gap-1 flex-shrink-0">
                 {onComplete && !isCompleted && (
                     <button
-                        onClick={onComplete}
-                        className="px-2 py-1 bg-green-500 text-white text-xs font-medium rounded hover:bg-green-600 transition-colors"
+                        onClick={(e) => { e.stopPropagation(); onComplete(); }}
+                        className="px-2 py-1 bg-green-500 text-white text-xs font-medium rounded hover:bg-green-600 hover:scale-105 transition-all"
                     >
                         Done
                     </button>
@@ -124,8 +128,8 @@ const ActionItem: React.FC<ActionItemProps> = ({
                 {actions.map((action, idx) => (
                     <button
                         key={idx}
-                        onClick={action.onClick}
-                        className={`px-2 py-1 text-xs font-medium rounded transition-colors ${
+                        onClick={(e) => { e.stopPropagation(); action.onClick(); }}
+                        className={`px-2 py-1 text-xs font-medium rounded transition-all hover:scale-105 ${
                             action.variant === 'primary'
                                 ? 'bg-blue-500 text-white hover:bg-blue-600'
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -753,51 +757,51 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
         return items.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
     }, [filteredProjects, filteredJournal, filteredItineraries]);
 
+    const familyActivityItems = useMemo(() => {
+        const items: { id: string; title: string; action: string; module: string; timestamp: Date; icon: any; iconBg: string; iconColor: string }[] = [];
+        
+        const sharedProjects = filteredProjects.filter(p => (p as any).sharedWith?.length > 0 || (p as any).sharingMode === 'Shared');
+        sharedProjects.slice(0, 3).forEach(p => {
+            items.push({
+                id: p.id,
+                title: p.name,
+                action: 'updated project',
+                module: 'Projects',
+                timestamp: new Date((p as any).updatedAt || (p as any).createdAt || Date.now()),
+                icon: FolderKanban,
+                iconBg: 'bg-orange-100',
+                iconColor: 'text-orange-600'
+            });
+        });
+        
+        const sharedJournal = filteredJournal.filter(j => (j as any).sharedWith?.length > 0 || (j as any).sharingMode === 'Shared');
+        sharedJournal.slice(0, 2).forEach(j => {
+            items.push({
+                id: j.id,
+                title: j.title || 'Journal entry',
+                action: 'wrote',
+                module: 'Journal',
+                timestamp: new Date(j.date || Date.now()),
+                icon: BookOpen,
+                iconBg: 'bg-pink-100',
+                iconColor: 'text-pink-600'
+            });
+        });
+        
+        return items.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()).slice(0, 5);
+    }, [filteredProjects, filteredJournal]);
+
     const moduleCards = useMemo(() => [
         {
             id: 'projects',
             name: 'Projects',
             icon: FolderKanban,
             count: filteredProjects.filter(p => p.status !== 'Completed').length,
-            color: 'from-blue-500 to-blue-600',
-            bgTint: 'bg-blue-50',
-            borderColor: 'border-blue-100'
-        },
-        {
-            id: 'goals',
-            name: 'Goals',
-            icon: Target,
-            count: filteredGoals.filter(g => g.status !== 'Completed').length,
-            color: 'from-red-500 to-rose-600',
-            bgTint: 'bg-red-50',
-            borderColor: 'border-red-100'
-        },
-        {
-            id: 'habits',
-            name: 'Habits',
-            icon: Flame,
-            count: filteredHabits.length,
-            color: 'from-orange-500 to-amber-600',
+            color: 'from-orange-500 to-orange-600',
             bgTint: 'bg-orange-50',
-            borderColor: 'border-orange-100'
-        },
-        {
-            id: 'itineraries',
-            name: 'Trips',
-            icon: Route,
-            count: filteredItineraries.filter(t => t.status !== 'Completed').length,
-            color: 'from-cyan-500 to-teal-600',
-            bgTint: 'bg-cyan-50',
-            borderColor: 'border-cyan-100'
-        },
-        {
-            id: 'places',
-            name: 'Places',
-            icon: MapPin,
-            count: filteredPlaces.length,
-            color: 'from-rose-500 to-pink-600',
-            bgTint: 'bg-rose-50',
-            borderColor: 'border-rose-100'
+            borderColor: 'border-orange-200',
+            cardBg: 'bg-orange-50/80',
+            cardHover: 'hover:bg-orange-100'
         },
         {
             id: 'financial',
@@ -806,25 +810,75 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
             count: filteredFinancial.length,
             color: 'from-emerald-500 to-green-600',
             bgTint: 'bg-emerald-50',
-            borderColor: 'border-emerald-100'
-        },
-        {
-            id: 'groceries',
-            name: 'Groceries',
-            icon: ShoppingBag,
-            count: filteredGroceries.filter(g => !g.completed).length,
-            color: 'from-lime-500 to-green-600',
-            bgTint: 'bg-lime-50',
-            borderColor: 'border-lime-100'
+            borderColor: 'border-emerald-200',
+            cardBg: 'bg-emerald-50/80',
+            cardHover: 'hover:bg-emerald-100'
         },
         {
             id: 'journal',
             name: 'Journal',
             icon: BookOpen,
             count: filteredJournal.length,
-            color: 'from-amber-500 to-yellow-600',
+            color: 'from-pink-500 to-rose-600',
+            bgTint: 'bg-pink-50',
+            borderColor: 'border-pink-200',
+            cardBg: 'bg-pink-50/80',
+            cardHover: 'hover:bg-pink-100'
+        },
+        {
+            id: 'itineraries',
+            name: 'Trips',
+            icon: Route,
+            count: filteredItineraries.filter(t => t.status !== 'Completed').length,
+            color: 'from-indigo-500 to-blue-600',
+            bgTint: 'bg-indigo-50',
+            borderColor: 'border-indigo-200',
+            cardBg: 'bg-indigo-50/80',
+            cardHover: 'hover:bg-indigo-100'
+        },
+        {
+            id: 'places',
+            name: 'Places',
+            icon: MapPin,
+            count: filteredPlaces.length,
+            color: 'from-rose-500 to-red-600',
+            bgTint: 'bg-rose-50',
+            borderColor: 'border-rose-200',
+            cardBg: 'bg-rose-50/80',
+            cardHover: 'hover:bg-rose-100'
+        },
+        {
+            id: 'groceries',
+            name: 'Groceries',
+            icon: Utensils,
+            count: filteredGroceries.filter(g => !g.completed).length,
+            color: 'from-lime-500 to-green-600',
+            bgTint: 'bg-lime-50',
+            borderColor: 'border-lime-200',
+            cardBg: 'bg-lime-50/80',
+            cardHover: 'hover:bg-lime-100'
+        },
+        {
+            id: 'habits',
+            name: 'Habits',
+            icon: Flame,
+            count: filteredHabits.length,
+            color: 'from-amber-500 to-orange-600',
             bgTint: 'bg-amber-50',
-            borderColor: 'border-amber-100'
+            borderColor: 'border-amber-200',
+            cardBg: 'bg-amber-50/80',
+            cardHover: 'hover:bg-amber-100'
+        },
+        {
+            id: 'goals',
+            name: 'Goals',
+            icon: Target,
+            count: filteredGoals.filter(g => g.status !== 'Completed').length,
+            color: 'from-red-500 to-rose-600',
+            bgTint: 'bg-red-50',
+            borderColor: 'border-red-200',
+            cardBg: 'bg-red-50/80',
+            cardHover: 'hover:bg-red-100'
         }
     ], [filteredProjects, filteredGoals, filteredHabits, filteredItineraries, filteredPlaces, filteredFinancial, filteredGroceries, filteredJournal]);
 
@@ -950,16 +1004,18 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                         badgeColor="red"
                         bgTint="bg-red-50"
                     >
-                        <div className="pt-3">
+                        <div className="pt-2">
                             {overdueItems.map(item => (
                                 <ActionItem
                                     key={item.id}
-                                    icon={<FolderKanban size={18} className="text-orange-600" />}
-                                    iconBg="bg-orange-100"
+                                    icon={<FolderKanban size={18} className="text-red-600" />}
+                                    iconBg="bg-red-100"
+                                    cardBg="bg-red-100/40"
+                                    cardHover="hover:bg-red-100"
                                     title={item.name}
                                     subtitle={item.parentProject?.name || ''}
                                     module="Projects"
-                                    time={`${item.daysOverdue} days overdue`}
+                                    time={`${item.daysOverdue}d overdue`}
                                     onComplete={() => handleCompleteTask(item)}
                                 />
                             ))}
@@ -974,7 +1030,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                     badgeColor="orange"
                     bgTint="bg-orange-50"
                 >
-                    <div className="pt-2">
+                    <div className="pt-1">
                         {todayItems.length === 0 ? (
                             <p className="text-gray-400 text-sm text-center py-4">No tasks for today</p>
                         ) : (
@@ -983,6 +1039,8 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                     key={item.id}
                                     icon={<item.icon size={18} className={item.iconColor} />}
                                     iconBg={item.iconBg}
+                                    cardBg="bg-orange-100/40"
+                                    cardHover="hover:bg-orange-100"
                                     title={item.name}
                                     subtitle={item.subtitle || item.parentProject?.name || ''}
                                     module={item.module}
@@ -1004,7 +1062,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                     bgTint="bg-blue-50"
                     defaultExpanded={false}
                 >
-                    <div className="pt-2">
+                    <div className="pt-1">
                         {upcomingItems.length === 0 ? (
                             <p className="text-gray-400 text-sm text-center py-4">No upcoming items</p>
                         ) : (
@@ -1021,6 +1079,8 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                         item.type === 'trip' ? 'bg-indigo-100' :
                                         'bg-orange-100'
                                     }
+                                    cardBg="bg-blue-100/40"
+                                    cardHover="hover:bg-blue-100"
                                     title={item.name}
                                     subtitle=""
                                     module={item.module}
@@ -1043,7 +1103,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                         bgTint="bg-purple-50"
                         defaultExpanded={false}
                     >
-                        <div className="pt-2">
+                        <div className="pt-1">
                             {forYouItems.map(item => (
                                 <ActionItem
                                     key={item.id}
@@ -1057,6 +1117,8 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                         item.module === 'Goals' ? 'bg-red-100' :
                                         'bg-pink-100'
                                     }
+                                    cardBg="bg-purple-100/40"
+                                    cardHover="hover:bg-purple-100"
                                     title={item.name}
                                     subtitle={item.subtitle || ''}
                                     module={item.module}
@@ -1066,93 +1128,144 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                         </div>
                     </CollapsibleSection>
                 )}
-            </div>
 
-            <div className="bg-slate-50 rounded-xl border border-slate-100 overflow-hidden">
-                <div className="flex items-center gap-2 px-3 py-2 border-b border-slate-100">
-                    <Clock size={16} className="text-slate-500" />
-                    <span className="font-semibold text-gray-800 text-sm">Recent Activity</span>
-                </div>
-                <div className="px-3 py-2">
-                    {recentItems.length === 0 ? (
-                        <p className="text-gray-400 text-sm text-center py-2">No recent activity</p>
-                    ) : (
-                        <div>
-                            {recentItems.map(item => {
+                {familyActivityItems.length > 0 && (
+                    <CollapsibleSection
+                        title="Family Activity"
+                        icon={<Users size={18} className="text-teal-500" />}
+                        badge={familyActivityItems.length}
+                        badgeColor="teal"
+                        bgTint="bg-teal-50"
+                        defaultExpanded={false}
+                    >
+                        <div className="pt-1">
+                            {familyActivityItems.map(item => {
                                 const IconComponent = item.icon;
+                                const timeAgo = Math.floor((Date.now() - item.timestamp.getTime()) / (1000 * 60 * 60 * 24));
                                 return (
-                                    <button
+                                    <ActionItem
                                         key={item.id}
-                                        onClick={() => handleNavigate(moduleToRoute[item.module] || item.module.toLowerCase(), item.id)}
-                                        className="w-full flex items-center gap-3 py-1.5 hover:bg-white/80 transition-colors text-left"
-                                    >
-                                        <div className={`w-6 h-6 rounded ${item.iconBg} flex items-center justify-center flex-shrink-0`}>
-                                            <IconComponent size={14} className={item.iconColor} />
-                                        </div>
-                                        <span className="font-medium text-gray-900 text-sm truncate flex-1">{item.title}</span>
-                                        <span className="text-xs text-gray-400 flex-shrink-0">{item.module}</span>
-                                        <span className="text-xs text-gray-400 flex-shrink-0">{item.subtitle}</span>
-                                        <ChevronRight size={14} className="text-gray-300 flex-shrink-0" />
-                                    </button>
+                                        icon={<IconComponent size={18} className={item.iconColor} />}
+                                        iconBg={item.iconBg}
+                                        cardBg="bg-teal-100/40"
+                                        cardHover="hover:bg-teal-100"
+                                        title={item.title}
+                                        subtitle={item.action}
+                                        module={item.module}
+                                        time={timeAgo === 0 ? 'Today' : `${timeAgo}d ago`}
+                                        actions={[
+                                            { label: 'View', onClick: () => handleNavigate(moduleToRoute[item.module] || item.module.toLowerCase(), item.id) }
+                                        ]}
+                                    />
                                 );
                             })}
                         </div>
-                    )}
-                </div>
+                    </CollapsibleSection>
+                )}
             </div>
 
-            <div className="space-y-3">
-                {moduleCards.map(card => {
-                    const IconComponent = card.icon;
-                    const getModuleItems = () => {
-                        switch (card.id) {
-                            case 'projects': return filteredProjects.slice(0, 5);
-                            case 'goals': return filteredGoals.slice(0, 5);
-                            case 'habits': return filteredHabits.slice(0, 5);
-                            case 'itineraries': return filteredItineraries.slice(0, 5);
-                            case 'places': return filteredPlaces.slice(0, 5);
-                            case 'financial': return filteredFinancial.slice(0, 5);
-                            case 'groceries': return filteredGroceries.filter(g => !g.completed).slice(0, 5);
-                            case 'journal': return filteredJournal.slice(0, 5);
-                            default: return [];
-                        }
-                    };
-                    const items = getModuleItems();
-                    
-                    return (
-                        <div key={card.id} className={`${card.bgTint} ${card.borderColor} border rounded-xl overflow-hidden`}>
-                            <button
-                                onClick={() => handleNavigate(card.id)}
-                                className="w-full flex items-center gap-2 px-3 py-2 hover:bg-white/50 transition-colors"
-                            >
-                                <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${card.color} flex items-center justify-center`}>
-                                    <IconComponent size={14} className="text-white" />
-                                </div>
-                                <span className="font-semibold text-gray-800 text-sm">{card.name}</span>
-                                <span className="text-xs text-gray-400 ml-auto">{card.count} active</span>
-                                <ChevronRight size={14} className="text-gray-400" />
-                            </button>
-                            {items.length > 0 && (
-                                <div className="px-3 pb-2 border-t border-gray-100/50">
-                                    {items.map((item: any) => (
-                                        <button
-                                            key={item.id}
-                                            onClick={() => handleNavigate(card.id, item.id)}
-                                            className="w-full flex items-center gap-2 py-1.5 text-left hover:bg-white/50 transition-colors"
-                                        >
-                                            <span className="w-1.5 h-1.5 rounded-full bg-gray-300 flex-shrink-0"></span>
-                                            <span className="text-sm text-gray-700 truncate flex-1">{item.name || item.title || item.description}</span>
-                                            <span className="text-xs text-gray-400 flex-shrink-0">
-                                                {item.status || item.type || item.mood || ''}
-                                            </span>
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    );
-                })}
-            </div>
+            <CollapsibleSection
+                title="Recent Activity"
+                icon={<Clock size={18} className="text-slate-500" />}
+                badge={recentItems.length}
+                badgeColor="green"
+                bgTint="bg-slate-50"
+                defaultExpanded={true}
+            >
+                <div className="pt-1">
+                    {recentItems.length === 0 ? (
+                        <p className="text-gray-400 text-sm text-center py-2">No recent activity</p>
+                    ) : (
+                        recentItems.map(item => {
+                            const IconComponent = item.icon;
+                            return (
+                                <button
+                                    key={item.id}
+                                    onClick={() => handleNavigate(moduleToRoute[item.module] || item.module.toLowerCase(), item.id)}
+                                    className="w-full flex items-center gap-3 py-2.5 px-3 my-1 rounded-lg bg-slate-100/50 hover:bg-slate-100 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-left"
+                                >
+                                    <div className={`w-7 h-7 rounded-lg ${item.iconBg} flex items-center justify-center flex-shrink-0`}>
+                                        <IconComponent size={14} className={item.iconColor} />
+                                    </div>
+                                    <span className="font-medium text-gray-900 text-sm truncate flex-1">{item.title}</span>
+                                    <span className="text-xs text-gray-400 flex-shrink-0">{item.module}</span>
+                                    <span className="text-xs text-gray-400 flex-shrink-0">{item.subtitle}</span>
+                                    <ChevronRight size={14} className="text-gray-400 flex-shrink-0" />
+                                </button>
+                            );
+                        })
+                    )}
+                </div>
+            </CollapsibleSection>
+
+            <CollapsibleSection
+                title="Modules"
+                icon={<LayoutDashboard size={18} className="text-gray-500" />}
+                bgTint="bg-gray-50"
+                defaultExpanded={true}
+            >
+                <div className="pt-1 space-y-2">
+                    {moduleCards.map(card => {
+                        const IconComponent = card.icon;
+                        const getModuleItems = () => {
+                            switch (card.id) {
+                                case 'projects': return filteredProjects.slice(0, 5);
+                                case 'goals': return filteredGoals.slice(0, 5);
+                                case 'habits': return filteredHabits.slice(0, 5);
+                                case 'itineraries': return filteredItineraries.slice(0, 5);
+                                case 'places': return filteredPlaces.slice(0, 5);
+                                case 'financial': return filteredFinancial.slice(0, 5);
+                                case 'groceries': return filteredGroceries.filter(g => !g.completed).slice(0, 5);
+                                case 'journal': return filteredJournal.slice(0, 5);
+                                default: return [];
+                            }
+                        };
+                        const items = getModuleItems();
+                        
+                        return (
+                            <div key={card.id} className={`${card.bgTint} ${card.borderColor} border rounded-xl overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-200`}>
+                                <button
+                                    onClick={() => handleNavigate(card.id)}
+                                    className={`w-full flex items-center gap-2 px-3 py-2.5 ${card.cardHover} transition-all`}
+                                >
+                                    <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${card.color} flex items-center justify-center shadow-sm`}>
+                                        <IconComponent size={16} className="text-white" />
+                                    </div>
+                                    <span className="font-semibold text-gray-800 text-sm">{card.name}</span>
+                                    <span className="text-xs text-gray-400 ml-auto">{card.count} active</span>
+                                    <ChevronRight size={14} className="text-gray-400" />
+                                </button>
+                                {items.length > 0 && (
+                                    <div className="px-3 pb-2 border-t border-gray-100/50">
+                                        {items.map((item: any) => (
+                                            <button
+                                                key={item.id}
+                                                onClick={() => handleNavigate(card.id, item.id)}
+                                                className={`w-full flex items-center gap-2 py-2 px-2 my-0.5 rounded-lg text-left ${card.cardBg} ${card.cardHover} hover:shadow-sm transition-all`}
+                                            >
+                                                <span className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                                                    card.id === 'projects' ? 'bg-orange-400' :
+                                                    card.id === 'financial' ? 'bg-emerald-400' :
+                                                    card.id === 'journal' ? 'bg-pink-400' :
+                                                    card.id === 'itineraries' ? 'bg-indigo-400' :
+                                                    card.id === 'places' ? 'bg-rose-400' :
+                                                    card.id === 'groceries' ? 'bg-lime-400' :
+                                                    card.id === 'habits' ? 'bg-amber-400' :
+                                                    'bg-red-400'
+                                                }`}></span>
+                                                <span className="text-sm text-gray-700 truncate flex-1">{item.name || item.title || item.description}</span>
+                                                <span className="text-xs text-gray-400 flex-shrink-0">
+                                                    {item.status || item.type || item.mood || ''}
+                                                </span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+            </CollapsibleSection>
         </div>
     );
 };
