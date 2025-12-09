@@ -82,8 +82,6 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
 
 interface ActionItemProps {
     icon: React.ReactNode;
-    iconBg: string;
-    hoverColor?: string;
     title: string;
     subtitle: string;
     module: string;
@@ -95,8 +93,6 @@ interface ActionItemProps {
 
 const ActionItem: React.FC<ActionItemProps> = ({
     icon,
-    iconBg,
-    hoverColor = 'hover:bg-gray-50',
     title,
     subtitle,
     module,
@@ -106,32 +102,29 @@ const ActionItem: React.FC<ActionItemProps> = ({
     isCompleted = false
 }) => {
     return (
-        <div className={`flex items-center gap-3 py-2 px-3 my-0.5 rounded-lg bg-white border border-gray-100 ${hoverColor} hover:shadow-sm transition-all duration-150 cursor-pointer ${isCompleted ? 'opacity-50' : ''}`}>
-            <div className={`w-7 h-7 rounded-lg ${iconBg} flex items-center justify-center flex-shrink-0`}>
+        <div className={`flex items-center gap-3 py-2.5 px-3 my-0.5 rounded-lg bg-white border border-gray-100 hover:bg-gray-50 transition-all duration-150 cursor-pointer ${isCompleted ? 'opacity-50' : ''}`}>
+            <div className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
                 {icon}
             </div>
-            <p className={`font-medium text-gray-900 text-sm truncate flex-1 min-w-0 ${isCompleted ? 'line-through' : ''}`}>{title}</p>
-            <span className="text-xs text-gray-400 flex-shrink-0">{subtitle}</span>
-            <span className="text-xs text-gray-400 flex-shrink-0 hidden sm:block">{module}</span>
+            <div className="flex-1 min-w-0">
+                <p className={`font-medium text-gray-900 text-sm truncate ${isCompleted ? 'line-through' : ''}`}>{title}</p>
+                <p className="text-xs text-gray-400 truncate">{module}{subtitle ? ` • ${subtitle}` : ''}</p>
+            </div>
             {time && <span className="text-xs text-gray-500 flex-shrink-0">{time}</span>}
             <div className="flex items-center gap-1 flex-shrink-0">
                 {onComplete && !isCompleted && (
                     <button
                         onClick={(e) => { e.stopPropagation(); onComplete(); }}
-                        className="px-2 py-1 bg-green-500 text-white text-xs font-medium rounded hover:bg-green-600 transition-all"
+                        className="px-3 py-1 bg-gray-900 text-white text-xs font-medium rounded-md hover:bg-gray-800 transition-all"
                     >
-                        Done
+                        Complete
                     </button>
                 )}
                 {actions.map((action, idx) => (
                     <button
                         key={idx}
                         onClick={(e) => { e.stopPropagation(); action.onClick(); }}
-                        className={`px-2 py-1 text-xs font-medium rounded transition-all ${
-                            action.variant === 'primary'
-                                ? 'bg-blue-500 text-white hover:bg-blue-600'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
+                        className="px-3 py-1 text-xs font-medium border border-gray-200 text-gray-700 rounded-md hover:bg-gray-100 transition-all"
                     >
                         {action.label}
                     </button>
@@ -1006,9 +999,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                             {overdueItems.map(item => (
                                 <ActionItem
                                     key={item.id}
-                                    icon={<FolderKanban size={16} className="text-red-600" />}
-                                    iconBg="bg-red-100"
-                                    hoverColor="hover:bg-red-50"
+                                    icon={<FolderKanban size={16} className="text-gray-500" />}
                                     title={item.name}
                                     subtitle={item.parentProject?.name || ''}
                                     module="Projects"
@@ -1034,9 +1025,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                             todayItems.map(item => (
                                 <ActionItem
                                     key={item.id}
-                                    icon={<item.icon size={16} className={item.iconColor} />}
-                                    iconBg={item.iconBg}
-                                    hoverColor="hover:bg-orange-50"
+                                    icon={<item.icon size={16} className="text-gray-500" />}
                                     title={item.name}
                                     subtitle={item.subtitle || item.parentProject?.name || ''}
                                     module={item.module}
@@ -1066,16 +1055,10 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                 <ActionItem
                                     key={item.id}
                                     icon={
-                                        item.type === 'goal' ? <Target size={16} className="text-red-600" /> :
-                                        item.type === 'trip' ? <Route size={16} className="text-indigo-600" /> :
-                                        <FolderKanban size={16} className="text-orange-600" />
+                                        item.type === 'goal' ? <Target size={16} className="text-gray-500" /> :
+                                        item.type === 'trip' ? <Route size={16} className="text-gray-500" /> :
+                                        <FolderKanban size={16} className="text-gray-500" />
                                     }
-                                    iconBg={
-                                        item.type === 'goal' ? 'bg-red-100' :
-                                        item.type === 'trip' ? 'bg-indigo-100' :
-                                        'bg-orange-100'
-                                    }
-                                    hoverColor="hover:bg-blue-50"
                                     title={item.name}
                                     subtitle=""
                                     module={item.module}
@@ -1103,16 +1086,10 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                 <ActionItem
                                     key={item.id}
                                     icon={
-                                        item.module === 'Places' ? <MapPin size={16} className="text-rose-600" /> :
-                                        item.module === 'Goals' ? <Target size={16} className="text-red-600" /> :
-                                        <BookOpen size={16} className="text-pink-600" />
+                                        item.module === 'Places' ? <MapPin size={16} className="text-gray-500" /> :
+                                        item.module === 'Goals' ? <Target size={16} className="text-gray-500" /> :
+                                        <BookOpen size={16} className="text-gray-500" />
                                     }
-                                    iconBg={
-                                        item.module === 'Places' ? 'bg-rose-100' :
-                                        item.module === 'Goals' ? 'bg-red-100' :
-                                        'bg-pink-100'
-                                    }
-                                    hoverColor="hover:bg-purple-50"
                                     title={item.name}
                                     subtitle={item.subtitle || ''}
                                     module={item.module}
@@ -1139,9 +1116,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                 return (
                                     <ActionItem
                                         key={item.id}
-                                        icon={<IconComponent size={16} className={item.iconColor} />}
-                                        iconBg={item.iconBg}
-                                        hoverColor="hover:bg-teal-50"
+                                        icon={<IconComponent size={16} className="text-gray-500" />}
                                         title={item.title}
                                         subtitle={item.action}
                                         module={item.module}
@@ -1175,14 +1150,15 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                 <button
                                     key={item.id}
                                     onClick={() => handleNavigate(moduleToRoute[item.module] || item.module.toLowerCase(), item.id)}
-                                    className="w-full flex items-center gap-3 py-2 px-3 my-0.5 rounded-lg bg-white border border-gray-100 hover:bg-slate-100 hover:shadow-sm transition-all duration-150 text-left"
+                                    className="w-full flex items-center gap-3 py-2.5 px-3 my-0.5 rounded-lg bg-white border border-gray-100 hover:bg-gray-50 transition-all duration-150 text-left"
                                 >
-                                    <div className={`w-7 h-7 rounded-lg ${item.iconBg} flex items-center justify-center flex-shrink-0`}>
-                                        <IconComponent size={14} className={item.iconColor} />
+                                    <div className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                        <IconComponent size={14} className="text-gray-500" />
                                     </div>
-                                    <span className="font-medium text-gray-900 text-sm truncate flex-1">{item.title}</span>
-                                    <span className="text-xs text-gray-400 flex-shrink-0">{item.module}</span>
-                                    <span className="text-xs text-gray-400 flex-shrink-0">{item.subtitle}</span>
+                                    <div className="flex-1 min-w-0">
+                                        <span className="font-medium text-gray-900 text-sm truncate block">{item.title}</span>
+                                        <span className="text-xs text-gray-400 truncate block">{item.module} • {item.subtitle}</span>
+                                    </div>
                                     <ChevronRight size={14} className="text-gray-400 flex-shrink-0" />
                                 </button>
                             );
@@ -1216,10 +1192,10 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                         const items = getModuleItems();
                         
                         return (
-                            <div key={card.id} className={`${card.bgTint} border ${card.borderColor} rounded-xl overflow-hidden`}>
+                            <div key={card.id} className="bg-white border border-gray-100 rounded-xl overflow-hidden">
                                 <button
                                     onClick={() => handleNavigate(card.id)}
-                                    className={`w-full flex items-center gap-2 px-3 py-2 ${card.cardHover} transition-all`}
+                                    className="w-full flex items-center gap-2 px-3 py-2.5 hover:bg-gray-50 transition-all"
                                 >
                                     <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${card.color} flex items-center justify-center`}>
                                         <IconComponent size={14} className="text-white" />
@@ -1229,23 +1205,14 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                     <ChevronRight size={14} className="text-gray-400" />
                                 </button>
                                 {items.length > 0 && (
-                                    <div className="px-3 pb-2 border-t border-gray-100/50">
+                                    <div className="px-3 pb-2 border-t border-gray-100">
                                         {items.map((item: any) => (
                                             <button
                                                 key={item.id}
                                                 onClick={() => handleNavigate(card.id, item.id)}
-                                                className={`w-full flex items-center gap-2 py-2 px-2 my-0.5 rounded-lg text-left bg-white border border-gray-100 ${card.cardHover} hover:shadow-sm transition-all`}
+                                                className="w-full flex items-center gap-2 py-2 px-2 my-0.5 rounded-lg text-left bg-white border border-gray-100 hover:bg-gray-50 transition-all"
                                             >
-                                                <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
-                                                    card.id === 'projects' ? 'bg-orange-400' :
-                                                    card.id === 'financial' ? 'bg-emerald-400' :
-                                                    card.id === 'journal' ? 'bg-pink-400' :
-                                                    card.id === 'itineraries' ? 'bg-indigo-400' :
-                                                    card.id === 'places' ? 'bg-rose-400' :
-                                                    card.id === 'groceries' ? 'bg-lime-400' :
-                                                    card.id === 'habits' ? 'bg-amber-400' :
-                                                    'bg-red-400'
-                                                }`}></span>
+                                                <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-gray-300"></span>
                                                 <span className="text-sm text-gray-700 truncate flex-1">{item.name || item.title || item.description}</span>
                                                 <span className="text-xs text-gray-400 flex-shrink-0">
                                                     {item.status || item.type || item.mood || ''}
