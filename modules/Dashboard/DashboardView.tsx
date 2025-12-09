@@ -1240,7 +1240,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                 })}
             </div>
 
-            {user?.isSystemAdmin && (
+            {(user?.isSystemAdmin || user?.isAdmin) && (
                 <CollapsibleSection
                     title="Upcoming Features"
                     icon={<Rocket size={16} />}
