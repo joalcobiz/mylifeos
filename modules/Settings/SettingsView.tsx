@@ -69,6 +69,8 @@ const DEFAULT_SETTINGS: Settings = {
     habitCategories: ['Health', 'Productivity', 'Learning', 'Wellness', 'Fitness'],
     goalCategories: ['Personal', 'Career', 'Health', 'Financial', 'Learning'],
     goalPriorities: ['High', 'Medium', 'Low'],
+    featureStatuses: ['Planned', 'In Progress', 'Testing', 'Completed', 'On Hold', 'Cancelled'],
+    featureTypes: ['module', 'improvement', 'bugfix', 'enhancement'],
     googleApiKey: '',
     currencyApiKey: ''
 };

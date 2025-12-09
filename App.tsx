@@ -3,7 +3,7 @@ import {
   LayoutDashboard, FolderKanban, Wallet, CreditCard, BookOpen, MapPin, 
   Settings, FileText, Menu, Moon, X, PieChart, Calendar as CalendarIcon, Utensils, LogOut, Lock,
   Cpu, Check, ChevronLeft, ChevronRight, Route, Grid, ShoppingBag, Target, Flame, Search, Plus, Sun,
-  Eye, EyeOff, Users
+  Eye, EyeOff, Users, Rocket
 } from 'lucide-react';
 import { View, MenuItem, Settings as SettingsType } from './types';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -34,6 +34,7 @@ const SettingsView = lazy(() => import('./modules/Settings/SettingsView'));
 const ItinerariesView = lazy(() => import('./modules/Itineraries/ItinerariesView'));
 const HabitsView = lazy(() => import('./modules/Habits/HabitsView'));
 const GoalsView = lazy(() => import('./modules/Goals/GoalsView'));
+const FeaturesView = lazy(() => import('./modules/Features/FeaturesView'));
 const PublicItineraryView = lazy(() => import('./modules/Itineraries/PublicItineraryView'));
 const GenealogyView = lazy(() => import('./modules/Genealogy/GenealogyView'));
 
@@ -64,6 +65,7 @@ const MODULE_METADATA: Record<string, { icon: any, label: string, color: string 
     'documents': { icon: FileText, label: 'Documents', color: 'sky' },
     'habits': { icon: Flame, label: 'Habits', color: 'orange' },
     'goals': { icon: Target, label: 'Goals', color: 'red' },
+    'features': { icon: Rocket, label: 'Feature Roadmap', color: 'violet' },
     'settings': { icon: Settings, label: 'Settings', color: 'slate' }
 };
 
@@ -306,10 +308,12 @@ function MainApp() {
   const [isGlobalAddOpen, setIsGlobalAddOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
+  const appSettings = settingsList[0];
+  const userProfiles = appSettings?.users || [];
+  const currentProfile = userProfiles.find((u: any) => u.id === user?.uid || u.email === user?.email);
+  const isAdminUser = currentProfile?.role === 'Admin' || currentProfile?.isSystemAdmin === true;
+
   useEffect(() => {
-      const settings = settingsList[0];
-      const userProfiles = settings?.users || [];
-      const currentProfile = userProfiles.find((u: any) => u.id === user?.uid || u.email === user?.email);
       const userTheme = currentProfile?.theme || (user as any)?.theme || 'blue';
       const colors = THEMES[userTheme as keyof typeof THEMES] || THEMES.blue;
       
@@ -469,6 +473,22 @@ function MainApp() {
         </div>
         
         <div className={`p-3 border-t border-gray-100 ${isMiniSidebar ? 'flex flex-col items-center' : ''}`}>
+            {/* Features Button - Admin Only */}
+            {isAdminUser && (
+              <button
+                onClick={() => handleNavigate('features')}
+                className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm transition-colors mb-2 ${
+                    currentView === 'features' 
+                        ? 'bg-violet-600 text-white' 
+                        : 'text-gray-600 hover:bg-violet-50'
+                } ${isMiniSidebar ? 'justify-center' : ''}`}
+                title={isMiniSidebar ? 'Feature Roadmap' : ''}
+              >
+                  <Rocket size={16} />
+                  {!isMiniSidebar && 'Feature Roadmap'}
+              </button>
+            )}
+            
             {/* Settings Button - Above User */}
             <button
               onClick={() => handleNavigate('settings')}
@@ -589,6 +609,7 @@ function MainApp() {
                         {currentView === 'settings' && <SettingsView />}
                         {currentView === 'habits' && <HabitsView />}
                         {currentView === 'goals' && <GoalsView />}
+                        {currentView === 'features' && <FeaturesView />}
                     </Suspense>
                 </ErrorBoundary>
             </div>

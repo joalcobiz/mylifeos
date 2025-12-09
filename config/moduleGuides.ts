@@ -7,7 +7,7 @@ import { ModuleColor } from '../components/ModuleHeader';
 export type ModuleKey = 
     | 'dashboard' | 'projects' | 'financial' | 'journal' | 'places' 
     | 'habits' | 'goals' | 'groceries' | 'purchases' | 'documents' 
-    | 'loans' | 'calendar' | 'itineraries' | 'genealogy' | 'templates' | 'settings';
+    | 'loans' | 'calendar' | 'itineraries' | 'genealogy' | 'templates' | 'settings' | 'features';
 
 export interface ModuleGuideSection {
     iconName: string;
@@ -225,6 +225,35 @@ export const MODULE_CONFIGS: Record<ModuleKey, ModuleConfig> = {
                 iconName: 'GitBranch',
                 title: 'Connected Modules',
                 content: 'Goals connect to Projects for execution and Dashboard for visibility on key objectives.'
+            }
+        ]
+    },
+    features: {
+        key: 'features',
+        title: 'Feature Roadmap',
+        subtitle: 'Track upcoming features and improvements',
+        iconName: 'Rocket',
+        color: 'violet',
+        guideSections: [
+            {
+                iconName: 'Lightbulb',
+                title: 'What is Feature Roadmap?',
+                content: 'Plan and track upcoming features, improvements, bug fixes, and enhancements. Admin-only module for managing the product roadmap.'
+            },
+            {
+                iconName: 'BookOpen',
+                title: 'How to Use',
+                content: [
+                    'Add features with type, difficulty, and priority',
+                    'Track status through custom workflow stages',
+                    'Add budgets and complexity estimates',
+                    'Group and sort by various criteria'
+                ]
+            },
+            {
+                iconName: 'Shield',
+                title: 'Admin Only',
+                content: 'This module is only visible to Admin and SystemAdmin users for internal planning purposes.'
             }
         ]
     },
