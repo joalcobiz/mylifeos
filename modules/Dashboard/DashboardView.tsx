@@ -20,7 +20,6 @@ interface CollapsibleSectionProps {
     icon: React.ReactNode;
     badge?: number;
     badgeColor?: 'red' | 'orange' | 'blue' | 'purple' | 'teal' | 'green' | 'slate';
-    hoverColor?: string;
     children: React.ReactNode;
     defaultExpanded?: boolean;
     actionButton?: React.ReactNode;
@@ -31,7 +30,6 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
     icon,
     badge,
     badgeColor = 'blue',
-    hoverColor = 'hover:bg-gray-100',
     children,
     defaultExpanded = true,
     actionButton
@@ -49,10 +47,10 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
     };
     
     return (
-        <div className={`bg-gray-50 rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200`}>
+        <div className="bg-white rounded-xl overflow-hidden">
             <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className={`w-full flex items-center justify-between p-3 ${hoverColor} transition-all duration-150`}
+                className="w-full flex items-center justify-between p-3 hover:bg-gray-50 transition-all duration-150"
             >
                 <div className="flex items-center gap-2">
                     {icon}
@@ -73,7 +71,7 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
                 </div>
             </button>
             {isExpanded && (
-                <div className="px-3 pb-3 border-t border-gray-200">
+                <div className="px-3 pb-3">
                     {children}
                 </div>
             )}
@@ -87,6 +85,7 @@ interface ActionItemProps {
     subtitle: string;
     module: string;
     time?: string;
+    hoverColor?: string;
     actions?: { label: string; onClick: () => void; variant?: 'primary' | 'secondary' }[];
     onComplete?: () => void;
     isCompleted?: boolean;
@@ -98,12 +97,13 @@ const ActionItem: React.FC<ActionItemProps> = ({
     subtitle,
     module,
     time,
+    hoverColor = 'hover:bg-gray-100',
     actions = [],
     onComplete,
     isCompleted = false
 }) => {
     return (
-        <div className={`flex items-center gap-3 py-2.5 px-3 my-0.5 rounded-lg bg-white border border-gray-100 hover:bg-gray-50 transition-all duration-150 cursor-pointer ${isCompleted ? 'opacity-50' : ''}`}>
+        <div className={`flex items-center gap-3 py-2.5 px-3 my-1 rounded-lg bg-gray-50 border border-gray-200 shadow-sm ${hoverColor} hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer ${isCompleted ? 'opacity-50' : ''}`}>
             <div className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
                 {icon}
             </div>
@@ -994,7 +994,6 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                         icon={<AlertOctagon size={18} className="text-red-500" />}
                         badge={overdueItems.length}
                         badgeColor="red"
-                        hoverColor="hover:bg-red-50"
                     >
                         <div className="pt-2">
                             {overdueItems.map(item => (
@@ -1005,6 +1004,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                     subtitle={item.parentProject?.name || ''}
                                     module="Projects"
                                     time={`${item.daysOverdue}d overdue`}
+                                    hoverColor="hover:bg-red-50"
                                     onComplete={() => handleCompleteTask(item)}
                                 />
                             ))}
@@ -1017,7 +1017,6 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                     icon={<CalendarIcon size={18} className="text-orange-500" />}
                     badge={todayItems.length}
                     badgeColor="orange"
-                    hoverColor="hover:bg-orange-50"
                 >
                     <div className="pt-1">
                         {todayItems.length === 0 ? (
@@ -1030,6 +1029,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                     title={item.name}
                                     subtitle={item.subtitle || item.parentProject?.name || ''}
                                     module={item.module}
+                                    hoverColor="hover:bg-orange-50"
                                     onComplete={item.type !== 'goal' ? () => handleCompleteTask(item) : undefined}
                                     actions={item.type === 'goal' ? [
                                         { label: 'View', onClick: () => handleNavigate('goals', item.id) }
@@ -1045,7 +1045,6 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                     icon={<Clock size={18} className="text-blue-500" />}
                     badge={upcomingItems.length}
                     badgeColor="blue"
-                    hoverColor="hover:bg-blue-50"
                     defaultExpanded={false}
                 >
                     <div className="pt-1">
@@ -1064,6 +1063,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                     subtitle=""
                                     module={item.module}
                                     time={getRelativeDate(item.dueDate)}
+                                    hoverColor="hover:bg-blue-50"
                                     actions={[
                                         { label: 'View', onClick: () => handleNavigate(moduleToRoute[item.module] || item.module.toLowerCase(), item.id) }
                                     ]}
@@ -1079,7 +1079,6 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                         icon={<Sparkles size={18} className="text-purple-500" />}
                         badge={forYouItems.length}
                         badgeColor="purple"
-                        hoverColor="hover:bg-purple-50"
                         defaultExpanded={false}
                     >
                         <div className="pt-1">
@@ -1094,6 +1093,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                     title={item.name}
                                     subtitle={item.subtitle || ''}
                                     module={item.module}
+                                    hoverColor="hover:bg-purple-50"
                                     actions={item.actions}
                                 />
                             ))}
@@ -1107,7 +1107,6 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                         icon={<Users size={18} className="text-teal-500" />}
                         badge={familyActivityItems.length}
                         badgeColor="teal"
-                        hoverColor="hover:bg-teal-50"
                         defaultExpanded={false}
                     >
                         <div className="pt-1">
@@ -1122,6 +1121,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                         subtitle={item.action}
                                         module={item.module}
                                         time={timeAgo === 0 ? 'Today' : `${timeAgo}d ago`}
+                                        hoverColor="hover:bg-teal-50"
                                         actions={[
                                             { label: 'View', onClick: () => handleNavigate(moduleToRoute[item.module] || item.module.toLowerCase(), item.id) }
                                         ]}
@@ -1138,7 +1138,6 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                 icon={<Clock size={18} className="text-slate-500" />}
                 badge={recentItems.length}
                 badgeColor="slate"
-                hoverColor="hover:bg-slate-100"
                 defaultExpanded={true}
             >
                 <div className="pt-1">
@@ -1151,7 +1150,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                 <button
                                     key={item.id}
                                     onClick={() => handleNavigate(moduleToRoute[item.module] || item.module.toLowerCase(), item.id)}
-                                    className="w-full flex items-center gap-3 py-2.5 px-3 my-0.5 rounded-lg bg-white border border-gray-100 hover:bg-gray-50 transition-all duration-150 text-left"
+                                    className="w-full flex items-center gap-3 py-2.5 px-3 my-1 rounded-lg bg-gray-50 border border-gray-200 shadow-sm hover:bg-slate-100 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-left"
                                 >
                                     <div className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
                                         <IconComponent size={14} className="text-gray-500" />
@@ -1171,7 +1170,6 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
             <CollapsibleSection
                 title="Modules"
                 icon={<LayoutDashboard size={18} className="text-gray-500" />}
-                hoverColor="hover:bg-gray-100"
                 defaultExpanded={true}
             >
                 <div className="pt-1 space-y-2">
@@ -1206,12 +1204,12 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                     <ChevronRight size={14} className="text-gray-400" />
                                 </button>
                                 {items.length > 0 && (
-                                    <div className="px-3 pb-2 border-t border-gray-100">
+                                    <div className="px-3 pb-2 border-t border-gray-200 bg-white">
                                         {items.map((item: any) => (
                                             <button
                                                 key={item.id}
                                                 onClick={() => handleNavigate(card.id, item.id)}
-                                                className="w-full flex items-center gap-2 py-2 px-2 my-0.5 rounded-lg text-left bg-white border border-gray-100 hover:bg-gray-50 transition-all"
+                                                className={`w-full flex items-center gap-2 py-2 px-2 my-1 rounded-lg text-left bg-gray-50 border border-gray-200 shadow-sm ${card.cardHover} hover:shadow-md hover:-translate-y-0.5 transition-all duration-200`}
                                             >
                                                 <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-gray-300"></span>
                                                 <span className="text-sm text-gray-700 truncate flex-1">{item.name || item.title || item.description}</span>
