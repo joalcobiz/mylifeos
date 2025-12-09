@@ -83,8 +83,7 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
 interface ActionItemProps {
     icon: React.ReactNode;
     iconBg: string;
-    cardBg?: string;
-    cardHover?: string;
+    hoverColor?: string;
     title: string;
     subtitle: string;
     module: string;
@@ -97,8 +96,7 @@ interface ActionItemProps {
 const ActionItem: React.FC<ActionItemProps> = ({
     icon,
     iconBg,
-    cardBg = 'bg-white/60',
-    cardHover = 'hover:bg-white',
+    hoverColor = 'hover:bg-gray-50',
     title,
     subtitle,
     module,
@@ -108,11 +106,11 @@ const ActionItem: React.FC<ActionItemProps> = ({
     isCompleted = false
 }) => {
     return (
-        <div className={`flex items-center gap-3 py-2.5 px-3 my-1 rounded-lg border border-transparent ${cardBg} ${cardHover} hover:shadow-md hover:border-gray-200/50 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer ${isCompleted ? 'opacity-50' : ''}`}>
-            <div className={`w-8 h-8 rounded-lg ${iconBg} flex items-center justify-center flex-shrink-0`}>
+        <div className={`flex items-center gap-3 py-2 px-3 my-0.5 rounded-lg bg-white border border-gray-100 ${hoverColor} hover:shadow-sm transition-all duration-150 cursor-pointer ${isCompleted ? 'opacity-50' : ''}`}>
+            <div className={`w-7 h-7 rounded-lg ${iconBg} flex items-center justify-center flex-shrink-0`}>
                 {icon}
             </div>
-            <p className={`font-medium text-gray-900 truncate flex-1 min-w-0 ${isCompleted ? 'line-through' : ''}`}>{title}</p>
+            <p className={`font-medium text-gray-900 text-sm truncate flex-1 min-w-0 ${isCompleted ? 'line-through' : ''}`}>{title}</p>
             <span className="text-xs text-gray-400 flex-shrink-0">{subtitle}</span>
             <span className="text-xs text-gray-400 flex-shrink-0 hidden sm:block">{module}</span>
             {time && <span className="text-xs text-gray-500 flex-shrink-0">{time}</span>}
@@ -120,7 +118,7 @@ const ActionItem: React.FC<ActionItemProps> = ({
                 {onComplete && !isCompleted && (
                     <button
                         onClick={(e) => { e.stopPropagation(); onComplete(); }}
-                        className="px-2 py-1 bg-green-500 text-white text-xs font-medium rounded hover:bg-green-600 hover:scale-105 transition-all"
+                        className="px-2 py-1 bg-green-500 text-white text-xs font-medium rounded hover:bg-green-600 transition-all"
                     >
                         Done
                     </button>
@@ -129,7 +127,7 @@ const ActionItem: React.FC<ActionItemProps> = ({
                     <button
                         key={idx}
                         onClick={(e) => { e.stopPropagation(); action.onClick(); }}
-                        className={`px-2 py-1 text-xs font-medium rounded transition-all hover:scale-105 ${
+                        className={`px-2 py-1 text-xs font-medium rounded transition-all ${
                             action.variant === 'primary'
                                 ? 'bg-blue-500 text-white hover:bg-blue-600'
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -1008,10 +1006,9 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                             {overdueItems.map(item => (
                                 <ActionItem
                                     key={item.id}
-                                    icon={<FolderKanban size={18} className="text-red-600" />}
+                                    icon={<FolderKanban size={16} className="text-red-600" />}
                                     iconBg="bg-red-100"
-                                    cardBg="bg-red-100/40"
-                                    cardHover="hover:bg-red-100"
+                                    hoverColor="hover:bg-red-50"
                                     title={item.name}
                                     subtitle={item.parentProject?.name || ''}
                                     module="Projects"
@@ -1037,10 +1034,9 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                             todayItems.map(item => (
                                 <ActionItem
                                     key={item.id}
-                                    icon={<item.icon size={18} className={item.iconColor} />}
+                                    icon={<item.icon size={16} className={item.iconColor} />}
                                     iconBg={item.iconBg}
-                                    cardBg="bg-orange-100/40"
-                                    cardHover="hover:bg-orange-100"
+                                    hoverColor="hover:bg-orange-50"
                                     title={item.name}
                                     subtitle={item.subtitle || item.parentProject?.name || ''}
                                     module={item.module}
@@ -1070,17 +1066,16 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                 <ActionItem
                                     key={item.id}
                                     icon={
-                                        item.type === 'goal' ? <Target size={18} className="text-red-600" /> :
-                                        item.type === 'trip' ? <Route size={18} className="text-indigo-600" /> :
-                                        <FolderKanban size={18} className="text-orange-600" />
+                                        item.type === 'goal' ? <Target size={16} className="text-red-600" /> :
+                                        item.type === 'trip' ? <Route size={16} className="text-indigo-600" /> :
+                                        <FolderKanban size={16} className="text-orange-600" />
                                     }
                                     iconBg={
                                         item.type === 'goal' ? 'bg-red-100' :
                                         item.type === 'trip' ? 'bg-indigo-100' :
                                         'bg-orange-100'
                                     }
-                                    cardBg="bg-blue-100/40"
-                                    cardHover="hover:bg-blue-100"
+                                    hoverColor="hover:bg-blue-50"
                                     title={item.name}
                                     subtitle=""
                                     module={item.module}
@@ -1108,17 +1103,16 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                 <ActionItem
                                     key={item.id}
                                     icon={
-                                        item.module === 'Places' ? <MapPin size={18} className="text-rose-600" /> :
-                                        item.module === 'Goals' ? <Target size={18} className="text-red-600" /> :
-                                        <BookOpen size={18} className="text-pink-600" />
+                                        item.module === 'Places' ? <MapPin size={16} className="text-rose-600" /> :
+                                        item.module === 'Goals' ? <Target size={16} className="text-red-600" /> :
+                                        <BookOpen size={16} className="text-pink-600" />
                                     }
                                     iconBg={
                                         item.module === 'Places' ? 'bg-rose-100' :
                                         item.module === 'Goals' ? 'bg-red-100' :
                                         'bg-pink-100'
                                     }
-                                    cardBg="bg-purple-100/40"
-                                    cardHover="hover:bg-purple-100"
+                                    hoverColor="hover:bg-purple-50"
                                     title={item.name}
                                     subtitle={item.subtitle || ''}
                                     module={item.module}
@@ -1145,10 +1139,9 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                 return (
                                     <ActionItem
                                         key={item.id}
-                                        icon={<IconComponent size={18} className={item.iconColor} />}
+                                        icon={<IconComponent size={16} className={item.iconColor} />}
                                         iconBg={item.iconBg}
-                                        cardBg="bg-teal-100/40"
-                                        cardHover="hover:bg-teal-100"
+                                        hoverColor="hover:bg-teal-50"
                                         title={item.title}
                                         subtitle={item.action}
                                         module={item.module}
@@ -1182,7 +1175,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                 <button
                                     key={item.id}
                                     onClick={() => handleNavigate(moduleToRoute[item.module] || item.module.toLowerCase(), item.id)}
-                                    className="w-full flex items-center gap-3 py-2.5 px-3 my-1 rounded-lg bg-slate-100/50 hover:bg-slate-100 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-left"
+                                    className="w-full flex items-center gap-3 py-2 px-3 my-0.5 rounded-lg bg-white border border-gray-100 hover:bg-slate-100 hover:shadow-sm transition-all duration-150 text-left"
                                 >
                                     <div className={`w-7 h-7 rounded-lg ${item.iconBg} flex items-center justify-center flex-shrink-0`}>
                                         <IconComponent size={14} className={item.iconColor} />
@@ -1223,13 +1216,13 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                         const items = getModuleItems();
                         
                         return (
-                            <div key={card.id} className={`${card.bgTint} ${card.borderColor} border rounded-xl overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-200`}>
+                            <div key={card.id} className={`${card.bgTint} border ${card.borderColor} rounded-xl overflow-hidden`}>
                                 <button
                                     onClick={() => handleNavigate(card.id)}
-                                    className={`w-full flex items-center gap-2 px-3 py-2.5 ${card.cardHover} transition-all`}
+                                    className={`w-full flex items-center gap-2 px-3 py-2 ${card.cardHover} transition-all`}
                                 >
-                                    <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${card.color} flex items-center justify-center shadow-sm`}>
-                                        <IconComponent size={16} className="text-white" />
+                                    <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${card.color} flex items-center justify-center`}>
+                                        <IconComponent size={14} className="text-white" />
                                     </div>
                                     <span className="font-semibold text-gray-800 text-sm">{card.name}</span>
                                     <span className="text-xs text-gray-400 ml-auto">{card.count} active</span>
@@ -1241,9 +1234,9 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                                             <button
                                                 key={item.id}
                                                 onClick={() => handleNavigate(card.id, item.id)}
-                                                className={`w-full flex items-center gap-2 py-2 px-2 my-0.5 rounded-lg text-left ${card.cardBg} ${card.cardHover} hover:shadow-sm transition-all`}
+                                                className={`w-full flex items-center gap-2 py-2 px-2 my-0.5 rounded-lg text-left bg-white border border-gray-100 ${card.cardHover} hover:shadow-sm transition-all`}
                                             >
-                                                <span className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                                                <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
                                                     card.id === 'projects' ? 'bg-orange-400' :
                                                     card.id === 'financial' ? 'bg-emerald-400' :
                                                     card.id === 'journal' ? 'bg-pink-400' :
