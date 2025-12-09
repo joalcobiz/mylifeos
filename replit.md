@@ -155,6 +155,20 @@ LIFEOS is built with React (TypeScript) and Vite. Styling is handled with Tailwi
 -   **Lucide React:** Icons
 -   **Leaflet.js with MarkerCluster:** Map functionalities
 
+## Planned Features
+
+### Access Level Legend
+- **SystemAdmin**: Platform owner/developer only
+- **GroupAdmin**: Group/family administrators
+- **AllUsers**: All authenticated users
+
+| Feature Name | Explanation | Module | Access | Images | Complexity | ETA |
+|-------------|-------------|--------|--------|--------|------------|-----|
+| Action Center Dashboard | Redesign Dashboard as comprehensive action hub with collapsible sections for Tasks, Habits, Goals, Financial summaries, and individual module cards | Dashboard | AllUsers | TBD | High | TBD |
+| *Add more features below* | | | | | | |
+
+---
+
 ## Key Files
 - `FIREBASE_SETUP.md` - Comprehensive Firebase architecture documentation for developers
 - `services/firebase.ts` - Firebase initialization
