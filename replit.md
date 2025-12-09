@@ -32,6 +32,7 @@ LIFEOS is built with React (TypeScript) and Vite, utilizing Tailwind CSS for sty
 - **Habits & Goals:** Tracking with visualizations.
 - **TaskStream:** Urgency system with `UrgencyType` values and color-coded indicators.
 - **Genealogy Module (Prototype):** Family tree visualization with mock members, list and tree views, person detail modals, and cross-module references.
+- **Feature Roadmap (Admin-only):** Track upcoming features, improvements, bug fixes, and enhancements. Supports card/table views, grouping by status/type/difficulty/priority, custom status management, budget tracking, complexity scores, and due dates. Visible only to Admin and SystemAdmin users.
 - **Security Rules:** Per-user data isolation, admin read access, and secure public itinerary sharing.
 
 ## External Dependencies
