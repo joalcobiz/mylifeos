@@ -1,5 +1,5 @@
 
-export type View = 'dashboard' | 'search' | 'calendar' | 'projects' | 'financial' | 'purchases' | 'loans' | 'journal' | 'genealogy' | 'places' | 'templates' | 'documents' | 'settings' | 'reports' | 'groceries' | 'itineraries' | 'habits' | 'goals' | 'admin';
+export type View = 'dashboard' | 'search' | 'calendar' | 'projects' | 'financial' | 'purchases' | 'loans' | 'journal' | 'genealogy' | 'places' | 'templates' | 'documents' | 'settings' | 'reports' | 'groceries' | 'itineraries' | 'habits' | 'goals' | 'admin' | 'features';
 
 export interface PlaceGoogleInfo {
     summary?: string;
@@ -492,6 +492,38 @@ export interface Goal {
     isTestData?: boolean;
 }
 
+// Upcoming Feature Interfaces
+export interface UpcomingFeature {
+    id: string;
+    name: string;
+    type: 'module' | 'improvement' | 'bugfix' | 'enhancement';
+    targetModule?: string;
+    description?: string;
+    notes?: string;
+    status: string;
+    difficulty: 'Easy' | 'Medium' | 'Hard';
+    complexity?: number; // 1-10 scale
+    budget?: number;
+    currency?: string;
+    attachments?: Attachment[];
+    priority?: 'Low' | 'Medium' | 'High' | 'Critical';
+    dueDate?: string;
+    completedAt?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    createdBy?: string;
+    isTestData?: boolean;
+}
+
+export interface Attachment {
+    id: string;
+    name: string;
+    url: string;
+    type: string;
+    size?: number;
+    uploadedAt?: string;
+}
+
 export interface NavigationState {
     view: View;
     params?: {
@@ -589,6 +621,10 @@ export interface Settings {
     habitCategories: string[];
     goalCategories: string[];
     goalPriorities: string[];
+    
+    // Feature Roadmap
+    featureStatuses: string[];
+    featureTypes: string[];
     
     // Dashboard Layout
     dashboardWidgets?: DashboardWidget[];
