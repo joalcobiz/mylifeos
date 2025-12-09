@@ -19,8 +19,8 @@ interface CollapsibleSectionProps {
     title: string;
     icon: React.ReactNode;
     badge?: number;
-    badgeColor?: 'red' | 'orange' | 'blue' | 'purple' | 'teal' | 'green';
-    bgTint?: string;
+    badgeColor?: 'red' | 'orange' | 'blue' | 'purple' | 'teal' | 'green' | 'slate';
+    hoverColor?: string;
     children: React.ReactNode;
     defaultExpanded?: boolean;
     actionButton?: React.ReactNode;
@@ -31,7 +31,7 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
     icon,
     badge,
     badgeColor = 'blue',
-    bgTint = 'bg-gray-50',
+    hoverColor = 'hover:bg-gray-100',
     children,
     defaultExpanded = true,
     actionButton
@@ -45,13 +45,14 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
         purple: 'bg-purple-500 text-white',
         teal: 'bg-teal-500 text-white',
         green: 'bg-green-500 text-white',
+        slate: 'bg-slate-500 text-white',
     };
     
     return (
-        <div className={`${bgTint} rounded-xl border border-gray-100 overflow-hidden`}>
+        <div className={`bg-gray-50 rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200`}>
             <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="w-full flex items-center justify-between p-3 hover:bg-white/50 transition-colors"
+                className={`w-full flex items-center justify-between p-3 ${hoverColor} transition-all duration-150`}
             >
                 <div className="flex items-center gap-2">
                     {icon}
@@ -72,7 +73,7 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
                 </div>
             </button>
             {isExpanded && (
-                <div className="px-3 pb-3 border-t border-gray-100/50">
+                <div className="px-3 pb-3 border-t border-gray-200">
                     {children}
                 </div>
             )}
@@ -993,7 +994,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                         icon={<AlertOctagon size={18} className="text-red-500" />}
                         badge={overdueItems.length}
                         badgeColor="red"
-                        bgTint="bg-red-50"
+                        hoverColor="hover:bg-red-50"
                     >
                         <div className="pt-2">
                             {overdueItems.map(item => (
@@ -1016,7 +1017,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                     icon={<CalendarIcon size={18} className="text-orange-500" />}
                     badge={todayItems.length}
                     badgeColor="orange"
-                    bgTint="bg-orange-50"
+                    hoverColor="hover:bg-orange-50"
                 >
                     <div className="pt-1">
                         {todayItems.length === 0 ? (
@@ -1044,7 +1045,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                     icon={<Clock size={18} className="text-blue-500" />}
                     badge={upcomingItems.length}
                     badgeColor="blue"
-                    bgTint="bg-blue-50"
+                    hoverColor="hover:bg-blue-50"
                     defaultExpanded={false}
                 >
                     <div className="pt-1">
@@ -1078,7 +1079,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                         icon={<Sparkles size={18} className="text-purple-500" />}
                         badge={forYouItems.length}
                         badgeColor="purple"
-                        bgTint="bg-purple-50"
+                        hoverColor="hover:bg-purple-50"
                         defaultExpanded={false}
                     >
                         <div className="pt-1">
@@ -1106,7 +1107,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                         icon={<Users size={18} className="text-teal-500" />}
                         badge={familyActivityItems.length}
                         badgeColor="teal"
-                        bgTint="bg-teal-50"
+                        hoverColor="hover:bg-teal-50"
                         defaultExpanded={false}
                     >
                         <div className="pt-1">
@@ -1136,8 +1137,8 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                 title="Recent Activity"
                 icon={<Clock size={18} className="text-slate-500" />}
                 badge={recentItems.length}
-                badgeColor="green"
-                bgTint="bg-slate-50"
+                badgeColor="slate"
+                hoverColor="hover:bg-slate-100"
                 defaultExpanded={true}
             >
                 <div className="pt-1">
@@ -1170,7 +1171,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
             <CollapsibleSection
                 title="Modules"
                 icon={<LayoutDashboard size={18} className="text-gray-500" />}
-                bgTint="bg-gray-50"
+                hoverColor="hover:bg-gray-100"
                 defaultExpanded={true}
             >
                 <div className="pt-1 space-y-2">
@@ -1192,10 +1193,10 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                         const items = getModuleItems();
                         
                         return (
-                            <div key={card.id} className="bg-white border border-gray-100 rounded-xl overflow-hidden">
+                            <div key={card.id} className="bg-gray-50 border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
                                 <button
                                     onClick={() => handleNavigate(card.id)}
-                                    className="w-full flex items-center gap-2 px-3 py-2.5 hover:bg-gray-50 transition-all"
+                                    className={`w-full flex items-center gap-2 px-3 py-2.5 ${card.cardHover} transition-all duration-150`}
                                 >
                                     <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${card.color} flex items-center justify-center`}>
                                         <IconComponent size={14} className="text-white" />
