@@ -7,7 +7,7 @@ import {
 import { useFirestore } from '../../services/firestore';
 import { UpcomingFeature, Settings as SettingsType } from '../../types';
 import Modal from '../../components/Modal';
-import ModuleHeader from '../../components/ModuleHeader';
+import { ConfiguredModuleHeader } from '../../components/ModuleHeader';
 import { useAuth } from '../../contexts/AuthContext';
 
 type ViewMode = 'cards' | 'table';
@@ -141,12 +141,12 @@ const FeaturesView: React.FC = () => {
         return result;
     }, [features, searchQuery, filterStatus, filterType, sortBy, sortAsc]);
 
-    const groupedFeatures = useMemo(() => {
+    const groupedFeatures = useMemo((): Record<string, UpcomingFeature[]> => {
         if (groupBy === 'none') return { 'All Features': filteredFeatures };
         
         const groups: Record<string, UpcomingFeature[]> = {};
         filteredFeatures.forEach(feature => {
-            const key = feature[groupBy] || 'Uncategorized';
+            const key = String(feature[groupBy as keyof UpcomingFeature] || 'Uncategorized');
             if (!groups[key]) groups[key] = [];
             groups[key].push(feature);
         });
@@ -406,12 +406,8 @@ const FeaturesView: React.FC = () => {
 
     return (
         <div className="space-y-6 animate-enter">
-            <ModuleHeader
-                module="features"
-                title="Feature Roadmap"
-                description="Track upcoming features, improvements, and bug fixes"
-                icon={<Rocket className="text-violet-600" />}
-                iconBgColor="bg-violet-100"
+            <ConfiguredModuleHeader
+                moduleKey="features"
                 actions={
                     <button
                         onClick={openNewFeature}
@@ -528,7 +524,7 @@ const FeaturesView: React.FC = () => {
                 renderTableView()
             ) : (
                 <div className="space-y-6">
-                    {Object.entries(groupedFeatures).map(([group, items]) => (
+                    {(Object.entries(groupedFeatures) as [string, UpcomingFeature[]][]).map(([group, items]) => (
                         <div key={group}>
                             {groupBy !== 'none' && (
                                 <div className="flex items-center gap-2 mb-3">
