@@ -144,7 +144,13 @@ LIFEOS is built with React (TypeScript) and Vite. Styling is handled with Tailwi
         - Elegant compact PDF export with dynamic row heights
         - Trip themes (default, tropical, adventure, city, beach, mountain)
     -   **Habits & Goals:** Tracking with visualizations
-    -   **Dashboard Task Stream:** Unified actionable items with urgency indicators
+    -   **Action Center Dashboard:** Redesigned comprehensive dashboard with:
+        - Personalized greeting header with date and quick stats (streak, tasks today, upcoming trips)
+        - Quick capture input for fast task/note entry
+        - This Week stats grid (Tasks Done, Habits %, Journal Entries, Money Spent)
+        - Collapsible sections: Overdue (red), Today (orange), Upcoming (blue), For You (purple)
+        - Module-specific action buttons (Complete, View, Update, Write)
+        - All sections respect sharing/permission filters
     -   **Multiple Grocery Lists:** Color-coded, customizable lists
     -   **User Deletion:** Three options - delete all, transfer ownership, keep shared
 
