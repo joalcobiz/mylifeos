@@ -311,7 +311,7 @@ function MainApp() {
   const appSettings = settingsList[0];
   const userProfiles = appSettings?.users || [];
   const currentProfile = userProfiles.find((u: any) => u.id === user?.uid || u.email === user?.email);
-  const isAdminUser = currentProfile?.role === 'Admin' || currentProfile?.isSystemAdmin === true;
+  const isAdminUser = (user as any)?.isAdmin === true || (user as any)?.isSystemAdmin === true || currentProfile?.role === 'Admin' || currentProfile?.isSystemAdmin === true;
 
   useEffect(() => {
       const userTheme = currentProfile?.theme || (user as any)?.theme || 'blue';
