@@ -20,6 +20,7 @@ interface CollapsibleSectionProps {
     icon: React.ReactNode;
     badge?: number;
     badgeColor?: 'red' | 'orange' | 'blue' | 'purple' | 'teal' | 'green';
+    bgTint?: string;
     children: React.ReactNode;
     defaultExpanded?: boolean;
     actionButton?: React.ReactNode;
@@ -30,6 +31,7 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
     icon,
     badge,
     badgeColor = 'blue',
+    bgTint = 'bg-gray-50',
     children,
     defaultExpanded = true,
     actionButton
@@ -46,16 +48,16 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
     };
     
     return (
-        <div className="bg-white/70 backdrop-blur rounded-xl border border-gray-100 overflow-hidden">
+        <div className={`${bgTint} rounded-xl border border-gray-100 overflow-hidden`}>
             <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+                className="w-full flex items-center justify-between p-3 hover:bg-white/50 transition-colors"
             >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                     {icon}
-                    <span className="font-semibold text-gray-800">{title}</span>
+                    <span className="font-semibold text-gray-800 text-sm">{title}</span>
                     {badge !== undefined && badge > 0 && (
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${badgeColors[badgeColor]}`}>
+                        <span className={`px-1.5 py-0.5 rounded-full text-xs font-medium ${badgeColors[badgeColor]}`}>
                             {badge}
                         </span>
                     )}
@@ -63,14 +65,14 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
                 <div className="flex items-center gap-2">
                     {actionButton}
                     {isExpanded ? (
-                        <ChevronUp size={18} className="text-gray-400" />
+                        <ChevronUp size={16} className="text-gray-400" />
                     ) : (
-                        <ChevronDown size={18} className="text-gray-400" />
+                        <ChevronDown size={16} className="text-gray-400" />
                     )}
                 </div>
             </button>
             {isExpanded && (
-                <div className="px-4 pb-4 border-t border-gray-100">
+                <div className="px-3 pb-3 border-t border-gray-100/50">
                     {children}
                 </div>
             )}
@@ -102,49 +104,36 @@ const ActionItem: React.FC<ActionItemProps> = ({
     isCompleted = false
 }) => {
     return (
-        <div className={`flex items-start gap-3 py-3 border-b border-gray-50 last:border-0 ${isCompleted ? 'opacity-50' : ''}`}>
-            <div className={`w-10 h-10 rounded-xl ${iconBg} flex items-center justify-center flex-shrink-0`}>
+        <div className={`flex items-center gap-3 py-2 border-b border-gray-50 last:border-0 ${isCompleted ? 'opacity-50' : ''}`}>
+            <div className={`w-8 h-8 rounded-lg ${iconBg} flex items-center justify-center flex-shrink-0`}>
                 {icon}
             </div>
-            <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                        <p className={`font-medium text-gray-900 truncate ${isCompleted ? 'line-through' : ''}`}>{title}</p>
-                        <p className="text-sm text-gray-500 truncate">{subtitle}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                            <span className="text-xs text-gray-400">{module}</span>
-                            {time && (
-                                <>
-                                    <span className="text-gray-300">•</span>
-                                    <span className="text-xs text-gray-400">{time}</span>
-                                </>
-                            )}
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                        {onComplete && !isCompleted && (
-                            <button
-                                onClick={onComplete}
-                                className="px-3 py-1.5 bg-green-500 text-white text-xs font-medium rounded-lg hover:bg-green-600 transition-colors"
-                            >
-                                Complete
-                            </button>
-                        )}
-                        {actions.map((action, idx) => (
-                            <button
-                                key={idx}
-                                onClick={action.onClick}
-                                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
-                                    action.variant === 'primary'
-                                        ? 'bg-blue-500 text-white hover:bg-blue-600'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                }`}
-                            >
-                                {action.label}
-                            </button>
-                        ))}
-                    </div>
-                </div>
+            <p className={`font-medium text-gray-900 truncate flex-1 min-w-0 ${isCompleted ? 'line-through' : ''}`}>{title}</p>
+            <span className="text-xs text-gray-400 flex-shrink-0">{subtitle}</span>
+            <span className="text-xs text-gray-400 flex-shrink-0 hidden sm:block">{module}</span>
+            {time && <span className="text-xs text-gray-500 flex-shrink-0">{time}</span>}
+            <div className="flex items-center gap-1 flex-shrink-0">
+                {onComplete && !isCompleted && (
+                    <button
+                        onClick={onComplete}
+                        className="px-2 py-1 bg-green-500 text-white text-xs font-medium rounded hover:bg-green-600 transition-colors"
+                    >
+                        Done
+                    </button>
+                )}
+                {actions.map((action, idx) => (
+                    <button
+                        key={idx}
+                        onClick={action.onClick}
+                        className={`px-2 py-1 text-xs font-medium rounded transition-colors ${
+                            action.variant === 'primary'
+                                ? 'bg-blue-500 text-white hover:bg-blue-600'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                    >
+                        {action.label}
+                    </button>
+                ))}
             </div>
         </div>
     );
@@ -840,8 +829,8 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
     ], [filteredProjects, filteredGoals, filteredHabits, filteredItineraries, filteredPlaces, filteredFinancial, filteredGroceries, filteredJournal]);
 
     return (
-        <div className="space-y-6 animate-enter">
-            <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 rounded-2xl p-6 text-white shadow-lg">
+        <div className="space-y-4 animate-enter bg-white -m-6 p-6">
+            <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 rounded-2xl p-5 text-white shadow-lg">
                 <div className="flex items-center justify-between flex-wrap gap-4">
                     <div>
                         <div className="flex items-center gap-2 mb-1">
@@ -952,32 +941,14 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                 </div>
             )}
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {moduleCards.map(card => {
-                    const IconComponent = card.icon;
-                    return (
-                        <button
-                            key={card.id}
-                            onClick={() => handleNavigate(card.id)}
-                            className={`${card.bgTint} ${card.borderColor} border rounded-xl p-4 text-left hover:shadow-md transition-all group`}
-                        >
-                            <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${card.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
-                                <IconComponent size={20} className="text-white" />
-                            </div>
-                            <p className="font-semibold text-gray-900">{card.name}</p>
-                            <p className="text-sm text-gray-500">{card.count} active</p>
-                        </button>
-                    );
-                })}
-            </div>
-
-            <div className="space-y-4">
+            <div className="space-y-3">
                 {overdueItems.length > 0 && (
                     <CollapsibleSection
                         title="Overdue"
-                        icon={<AlertOctagon size={20} className="text-red-500" />}
+                        icon={<AlertOctagon size={18} className="text-red-500" />}
                         badge={overdueItems.length}
                         badgeColor="red"
+                        bgTint="bg-red-50"
                     >
                         <div className="pt-3">
                             {overdueItems.map(item => (
@@ -998,11 +969,12 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
 
                 <CollapsibleSection
                     title="Today"
-                    icon={<CalendarIcon size={20} className="text-orange-500" />}
+                    icon={<CalendarIcon size={18} className="text-orange-500" />}
                     badge={todayItems.length}
                     badgeColor="orange"
+                    bgTint="bg-orange-50"
                 >
-                    <div className="pt-3">
+                    <div className="pt-2">
                         {todayItems.length === 0 ? (
                             <p className="text-gray-400 text-sm text-center py-4">No tasks for today</p>
                         ) : (
@@ -1026,12 +998,13 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
 
                 <CollapsibleSection
                     title="Upcoming"
-                    icon={<Clock size={20} className="text-blue-500" />}
+                    icon={<Clock size={18} className="text-blue-500" />}
                     badge={upcomingItems.length}
                     badgeColor="blue"
+                    bgTint="bg-blue-50"
                     defaultExpanded={false}
                 >
-                    <div className="pt-3">
+                    <div className="pt-2">
                         {upcomingItems.length === 0 ? (
                             <p className="text-gray-400 text-sm text-center py-4">No upcoming items</p>
                         ) : (
@@ -1064,12 +1037,13 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                 {forYouItems.length > 0 && (
                     <CollapsibleSection
                         title="For You"
-                        icon={<Sparkles size={20} className="text-purple-500" />}
+                        icon={<Sparkles size={18} className="text-purple-500" />}
                         badge={forYouItems.length}
                         badgeColor="purple"
+                        bgTint="bg-purple-50"
                         defaultExpanded={false}
                     >
-                        <div className="pt-3">
+                        <div className="pt-2">
                             {forYouItems.map(item => (
                                 <ActionItem
                                     key={item.id}
@@ -1094,45 +1068,90 @@ const DashboardView: React.FC<DashboardViewProps> = ({ autoFocusSearch, onNaviga
                 )}
             </div>
 
-            <div className="bg-gradient-to-r from-slate-50 via-gray-50 to-zinc-50 rounded-2xl border border-slate-200 overflow-hidden">
-                <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-500 to-gray-600 flex items-center justify-center">
-                            <Clock size={16} className="text-white" />
-                        </div>
-                        <div>
-                            <h3 className="font-semibold text-gray-900">Recent Activity</h3>
-                            <p className="text-xs text-gray-500">Your latest updates</p>
-                        </div>
-                    </div>
+            <div className="bg-slate-50 rounded-xl border border-slate-100 overflow-hidden">
+                <div className="flex items-center gap-2 px-3 py-2 border-b border-slate-100">
+                    <Clock size={16} className="text-slate-500" />
+                    <span className="font-semibold text-gray-800 text-sm">Recent Activity</span>
                 </div>
-                <div className="p-4">
+                <div className="px-3 py-2">
                     {recentItems.length === 0 ? (
-                        <p className="text-gray-400 text-sm text-center py-4">No recent activity</p>
+                        <p className="text-gray-400 text-sm text-center py-2">No recent activity</p>
                     ) : (
-                        <div className="space-y-3">
+                        <div>
                             {recentItems.map(item => {
                                 const IconComponent = item.icon;
                                 return (
                                     <button
                                         key={item.id}
                                         onClick={() => handleNavigate(moduleToRoute[item.module] || item.module.toLowerCase(), item.id)}
-                                        className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/80 transition-colors text-left"
+                                        className="w-full flex items-center gap-3 py-1.5 hover:bg-white/80 transition-colors text-left"
                                     >
-                                        <div className={`w-10 h-10 rounded-lg ${item.iconBg} flex items-center justify-center flex-shrink-0`}>
-                                            <IconComponent size={18} className={item.iconColor} />
+                                        <div className={`w-6 h-6 rounded ${item.iconBg} flex items-center justify-center flex-shrink-0`}>
+                                            <IconComponent size={14} className={item.iconColor} />
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="font-medium text-gray-900 truncate">{item.title}</p>
-                                            <p className="text-xs text-gray-500">{item.module} • {item.subtitle}</p>
-                                        </div>
-                                        <ChevronRight size={16} className="text-gray-400 flex-shrink-0" />
+                                        <span className="font-medium text-gray-900 text-sm truncate flex-1">{item.title}</span>
+                                        <span className="text-xs text-gray-400 flex-shrink-0">{item.module}</span>
+                                        <span className="text-xs text-gray-400 flex-shrink-0">{item.subtitle}</span>
+                                        <ChevronRight size={14} className="text-gray-300 flex-shrink-0" />
                                     </button>
                                 );
                             })}
                         </div>
                     )}
                 </div>
+            </div>
+
+            <div className="space-y-3">
+                {moduleCards.map(card => {
+                    const IconComponent = card.icon;
+                    const getModuleItems = () => {
+                        switch (card.id) {
+                            case 'projects': return filteredProjects.slice(0, 5);
+                            case 'goals': return filteredGoals.slice(0, 5);
+                            case 'habits': return filteredHabits.slice(0, 5);
+                            case 'itineraries': return filteredItineraries.slice(0, 5);
+                            case 'places': return filteredPlaces.slice(0, 5);
+                            case 'financial': return filteredFinancial.slice(0, 5);
+                            case 'groceries': return filteredGroceries.filter(g => !g.completed).slice(0, 5);
+                            case 'journal': return filteredJournal.slice(0, 5);
+                            default: return [];
+                        }
+                    };
+                    const items = getModuleItems();
+                    
+                    return (
+                        <div key={card.id} className={`${card.bgTint} ${card.borderColor} border rounded-xl overflow-hidden`}>
+                            <button
+                                onClick={() => handleNavigate(card.id)}
+                                className="w-full flex items-center gap-2 px-3 py-2 hover:bg-white/50 transition-colors"
+                            >
+                                <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${card.color} flex items-center justify-center`}>
+                                    <IconComponent size={14} className="text-white" />
+                                </div>
+                                <span className="font-semibold text-gray-800 text-sm">{card.name}</span>
+                                <span className="text-xs text-gray-400 ml-auto">{card.count} active</span>
+                                <ChevronRight size={14} className="text-gray-400" />
+                            </button>
+                            {items.length > 0 && (
+                                <div className="px-3 pb-2 border-t border-gray-100/50">
+                                    {items.map((item: any) => (
+                                        <button
+                                            key={item.id}
+                                            onClick={() => handleNavigate(card.id, item.id)}
+                                            className="w-full flex items-center gap-2 py-1.5 text-left hover:bg-white/50 transition-colors"
+                                        >
+                                            <span className="w-1.5 h-1.5 rounded-full bg-gray-300 flex-shrink-0"></span>
+                                            <span className="text-sm text-gray-700 truncate flex-1">{item.name || item.title || item.description}</span>
+                                            <span className="text-xs text-gray-400 flex-shrink-0">
+                                                {item.status || item.type || item.mood || ''}
+                                            </span>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
             </div>
         </div>
     );

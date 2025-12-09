@@ -145,13 +145,15 @@ LIFEOS is built with React (TypeScript) and Vite. Styling is handled with Tailwi
         - Trip themes (default, tropical, adventure, city, beach, mountain)
     -   **Habits & Goals:** Tracking with visualizations
     -   **Action Center Dashboard:** Redesigned comprehensive dashboard with:
-        - Dark gradient header with personalized greeting and quick stats (streak, tasks today, upcoming trips)
-        - "On This Day" purple gradient carousel showing memories from years past (trips, journal entries, places visited, family events)
-        - Module cards grid (8 modules) with unique color tints - click to navigate
-        - Collapsible sections: Overdue (red), Today (orange), Upcoming (blue), For You (purple)
-        - Recent Activity section at bottom with slate gradient showing latest items
-        - Module-specific action buttons (Complete, View, Update, Write)
+        - White page background with colored section tints for visual separation
+        - Dark gradient header with personalized greeting and quick stats
+        - "On This Day" purple gradient carousel showing memories from years past
+        - Collapsible sections with unique tints: Overdue (red-50), Today (orange-50), Upcoming (blue-50), For You (purple-50)
+        - Single-line compact entries with info to the right of title
+        - Recent Activity section (slate-50) with single-line items
+        - Full-width module cards at bottom showing last 5 entries per module
         - All sections respect sharing/permission filters
+    -   **Itineraries Stops:** Compact table-like single-row display for better readability
     -   **Multiple Grocery Lists:** Color-coded, customizable lists
     -   **User Deletion:** Three options - delete all, transfer ownership, keep shared
 

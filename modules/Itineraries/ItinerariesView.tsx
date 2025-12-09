@@ -270,7 +270,7 @@ const CollapsibleDaySection: React.FC<{
                                     <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent" />
                                 </div>
                                 
-                                <div className="space-y-2 pl-8">
+                                <div className="pl-8">
                                     {segmentStops.map((stop, idx) => {
                                         const placeTypeInfo = getPlaceTypeInfo(stop.placeType);
                                         const PlaceIcon = placeTypeInfo.icon;
@@ -278,133 +278,76 @@ const CollapsibleDaySection: React.FC<{
                                         return (
                                             <div 
                                                 key={stop.id}
-                                                className={`group relative p-4 rounded-xl border transition-all hover:shadow-md ${
-                                                    stop.completed 
-                                                        ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200' 
-                                                        : 'bg-white border-gray-100 hover:border-gray-200'
+                                                className={`group flex items-center gap-2 py-1.5 px-2 rounded-lg transition-all hover:bg-gray-50 ${
+                                                    stop.completed ? 'opacity-60' : ''
                                                 }`}
                                             >
-                                                <div className="flex items-start gap-3">
-                                                    <button
-                                                        onClick={() => onToggleStop(stop.id)}
-                                                        className={`w-7 h-7 rounded-full flex items-center justify-center transition-all flex-shrink-0 ${
-                                                            stop.completed
-                                                                ? 'bg-gradient-to-br from-green-400 to-emerald-500 text-white shadow-md'
-                                                                : 'border-2 border-gray-300 text-transparent hover:border-green-400 hover:bg-green-50'
-                                                        }`}
-                                                    >
-                                                        <CheckCircle size={14} />
-                                                    </button>
-                                                    
-                                                    <div className="flex-1 min-w-0">
-                                                        <div className="flex items-center gap-2 flex-wrap">
-                                                            <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${placeTypeInfo.color} bg-gray-100`}>
-                                                                <PlaceIcon size={12} />
-                                                            </div>
-                                                            <span className={`font-semibold ${stop.completed ? 'text-gray-400 line-through' : 'text-gray-900'}`}>
-                                                                {stop.name}
-                                                            </span>
-                                                            {stop.placeType && stop.placeType !== 'Other' && (
-                                                                <Badge variant="default" size="xs">{stop.placeType}</Badge>
-                                                            )}
-                                                            {stop.source && stop.source !== 'manual' && (
-                                                                <Badge variant="info" size="xs" className="opacity-60">
-                                                                    {stop.source === 'places' ? 'Google' : stop.source === 'saved' ? 'Saved' : 'Custom'}
-                                                                </Badge>
-                                                            )}
-                                                        </div>
-                                                        
-                                                        <div className="flex items-center gap-3 text-xs text-gray-500 mt-1.5 flex-wrap">
-                                                            {stop.time && (
-                                                                <span className="flex items-center gap-1 font-medium">
-                                                                    <Clock size={10} />
-                                                                    {stop.time}
-                                                                </span>
-                                                            )}
-                                                            {stop.address && (
-                                                                <span className="flex items-center gap-1 truncate max-w-[200px]">
-                                                                    <MapPin size={10} />
-                                                                    {stop.address}
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                        
-                                                        {editingStopId === stop.id ? (
-                                                            <div className="mt-2 flex gap-2">
-                                                                <input
-                                                                    type="text"
-                                                                    value={editingNotes}
-                                                                    onChange={(e) => setEditingNotes(e.target.value)}
-                                                                    className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary-muted"
-                                                                    placeholder="Add notes..."
-                                                                    autoFocus
-                                                                />
-                                                                <button
-                                                                    onClick={() => { onEditNotes(stop.id, editingNotes); setEditingStopId(null); }}
-                                                                    className="text-xs px-3 py-1.5 bg-primary text-white rounded-lg shadow-sm"
-                                                                >
-                                                                    Save
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => setEditingStopId(null)}
-                                                                    className="text-xs px-2 py-1.5 text-gray-500 hover:text-gray-700"
-                                                                >
-                                                                    Cancel
-                                                                </button>
-                                                            </div>
-                                                        ) : stop.notes ? (
-                                                            <p 
-                                                                className="mt-2 text-sm text-gray-600 bg-gray-50 rounded-lg px-3 py-2 cursor-pointer hover:bg-gray-100 transition-colors"
-                                                                onClick={() => { setEditingStopId(stop.id); setEditingNotes(stop.notes || ''); }}
-                                                            >
-                                                                <MessageSquare size={12} className="inline mr-1.5 text-gray-400" />
-                                                                {stop.notes}
-                                                            </p>
-                                                        ) : (
-                                                            <button
-                                                                onClick={() => { setEditingStopId(stop.id); setEditingNotes(''); }}
-                                                                className="mt-2 text-xs text-gray-400 hover:text-primary flex items-center gap-1 transition-colors"
-                                                            >
-                                                                <MessageSquare size={10} /> Add note
-                                                            </button>
-                                                        )}
-                                                        
-                                                        <MapPreview 
-                                                            stop={stop} 
-                                                            expanded={expandedMaps.has(stop.id)}
-                                                            onToggle={() => toggleMap(stop.id)}
-                                                        />
-                                                    </div>
-                                                    
-                                                    <div className="flex flex-col items-end gap-1.5">
-                                                        <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium">
-                                                            #{idx + 1}
-                                                        </span>
-                                                        <div className="flex gap-1">
-                                                            <button
-                                                                onClick={() => onEditStop(stop)}
-                                                                className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
-                                                                title="Edit stop"
-                                                            >
-                                                                <Edit2 size={12} />
-                                                            </button>
-                                                            {!stop.completed && (
-                                                                <button
-                                                                    onClick={() => onCompleteVisit(stop.id)}
-                                                                    className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                                                    title="Add journal entry"
-                                                                >
-                                                                    <BookOpen size={12} />
-                                                                </button>
-                                                            )}
-                                                        </div>
-                                                        {stop.journalEntryId && (
-                                                            <span className="text-[10px] text-green-600 flex items-center gap-0.5">
-                                                                <CheckCircle size={8} /> Journaled
-                                                            </span>
-                                                        )}
-                                                    </div>
+                                                <button
+                                                    onClick={() => onToggleStop(stop.id)}
+                                                    className={`w-5 h-5 rounded-full flex items-center justify-center transition-all flex-shrink-0 ${
+                                                        stop.completed
+                                                            ? 'bg-green-500 text-white'
+                                                            : 'border border-gray-300 text-transparent hover:border-green-400'
+                                                    }`}
+                                                >
+                                                    <CheckCircle size={10} />
+                                                </button>
+                                                
+                                                <span className="text-xs text-gray-400 w-5 text-center flex-shrink-0">#{idx + 1}</span>
+                                                
+                                                <div className={`w-5 h-5 rounded flex items-center justify-center ${placeTypeInfo.color} bg-gray-100 flex-shrink-0`}>
+                                                    <PlaceIcon size={10} />
                                                 </div>
+                                                
+                                                <span className={`font-medium text-sm truncate flex-1 min-w-0 ${stop.completed ? 'text-gray-400 line-through' : 'text-gray-900'}`}>
+                                                    {stop.name}
+                                                </span>
+                                                
+                                                {stop.time && (
+                                                    <span className="text-xs text-gray-500 flex items-center gap-0.5 flex-shrink-0">
+                                                        <Clock size={10} />
+                                                        {stop.time}
+                                                    </span>
+                                                )}
+                                                
+                                                {stop.placeType && stop.placeType !== 'Other' && (
+                                                    <Badge variant="default" size="xs" className="flex-shrink-0">{stop.placeType}</Badge>
+                                                )}
+                                                
+                                                {stop.address && (
+                                                    <span className="text-xs text-gray-400 truncate max-w-[120px] hidden md:block flex-shrink-0">
+                                                        {stop.address.split(',')[0]}
+                                                    </span>
+                                                )}
+                                                
+                                                {stop.notes && (
+                                                    <MessageSquare size={10} className="text-gray-400 flex-shrink-0" title={stop.notes} />
+                                                )}
+                                                
+                                                <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                                                    <button
+                                                        onClick={() => onEditStop(stop)}
+                                                        className="p-1 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
+                                                        title="Edit stop"
+                                                    >
+                                                        <Edit2 size={12} />
+                                                    </button>
+                                                    {!stop.completed && (
+                                                        <button
+                                                            onClick={() => onCompleteVisit(stop.id)}
+                                                            className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                                                            title="Add journal entry"
+                                                        >
+                                                            <BookOpen size={12} />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                                
+                                                {stop.journalEntryId && (
+                                                    <span className="text-[10px] text-green-600 flex items-center gap-0.5 flex-shrink-0">
+                                                        <CheckCircle size={8} /> Journaled
+                                                    </span>
+                                                )}
                                             </div>
                                         );
                                     })}
